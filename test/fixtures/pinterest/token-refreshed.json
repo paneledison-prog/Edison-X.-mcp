@@ -1,0 +1,7 @@
+{
+  "access_token": "pina_ACCESS_TOKEN_TWO_planted",
+  "refresh_token": "pinr_REFRESH_TOKEN_TWO_planted",
+  "token_type": "bearer",
+  "expires_in": 2592000,
+  "scope": "boards:read,pins:read"
+}

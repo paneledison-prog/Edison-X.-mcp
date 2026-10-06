@@ -1,0 +1,18 @@
+# Local or single-host run. Put TLS (a reverse proxy) in front of the published port before exposing it to the internet.
+services:
+  edison-x:
+    build: .
+    restart: unless-stopped
+    env_file: .env # copy .env.example to .env and fill it in (TOKEN_ENCRYPTION_KEY at minimum)
+    environment:
+      TRANSPORT: http
+      BIND_HOST: 0.0.0.0
+      DATABASE_PATH: /data/edison-x.db
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - edison-data:/data
+      - ./docs/SOURCES.md:/app/docs/SOURCES.md:ro
+      - ./library:/app/library:ro
+volumes:
+  edison-data:
