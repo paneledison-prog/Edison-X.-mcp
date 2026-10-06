@@ -10,7 +10,9 @@ import { createLogger } from "../src/observability/logger.js";
 import { runHttp } from "../src/transport/http.js";
 import { randomBytes } from "node:crypto";
 
-const { values } = parseArgs({ options: { seconds: { type: "string", default: "10" }, concurrency: { type: "string", default: "32" } } });
+const { values } = parseArgs({
+  options: { seconds: { type: "string", default: "10" }, concurrency: { type: "string", default: "32" } },
+});
 const seconds = Number(values.seconds);
 const concurrency = Number(values.concurrency);
 
@@ -48,19 +50,47 @@ const http = await runHttp(app, 0);
 const { key } = app.keys.create({ name: "load", ratePerMin: 1_000_000, ratePerDay: 100_000_000 });
 const url = `http://127.0.0.1:${http.port}/mcp`;
 
-const queries = ["dark fitness dashboard", "landing page hero", "mobile onboarding", "pricing table", "settings page toggles", "checkout form", "calendar week view", "map list", "kanban board", "profile feed"];
-const ids = ["library:fitness-dashboard-dark", "library:saas-landing-hero", "library:calendar-week-view", "library:map-with-list"];
+const queries = [
+  "dark fitness dashboard",
+  "landing page hero",
+  "mobile onboarding",
+  "pricing table",
+  "settings page toggles",
+  "checkout form",
+  "calendar week view",
+  "map list",
+  "kanban board",
+  "profile feed",
+];
+const ids = [
+  "library:fitness-dashboard-dark",
+  "library:saas-landing-hero",
+  "library:calendar-week-view",
+  "library:map-with-list",
+];
 
 let n = 0;
 const call = async (name: string, args: unknown): Promise<{ ok: boolean; ms: number }> => {
   const started = performance.now();
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream", Authorization: `Bearer ${key}` },
-    body: JSON.stringify({ jsonrpc: "2.0", id: ++n, method: "tools/call", params: { name, arguments: args } }),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json, text/event-stream",
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: ++n,
+      method: "tools/call",
+      params: { name, arguments: args },
+    }),
   });
   const body = (await res.json()) as { result?: { isError?: boolean } };
-  return { ok: res.status === 200 && body.result !== undefined && !body.result.isError, ms: performance.now() - started };
+  return {
+    ok: res.status === 200 && body.result !== undefined && !body.result.isError,
+    ms: performance.now() - started,
+  };
 };
 
 const latencies: number[] = [];
@@ -84,7 +114,8 @@ const started = performance.now();
 await Promise.all(Array.from({ length: concurrency }, (_, w) => worker(w)));
 const elapsed = (performance.now() - started) / 1000;
 latencies.sort((a, b) => a - b);
-const pct = (p: number): number => latencies[Math.min(latencies.length - 1, Math.floor((p / 100) * latencies.length))] ?? 0;
+const pct = (p: number): number =>
+  latencies[Math.min(latencies.length - 1, Math.floor((p / 100) * latencies.length))] ?? 0;
 console.log(
   JSON.stringify(
     {
@@ -93,7 +124,12 @@ console.log(
       requests: latencies.length,
       failures,
       throughputPerSec: Math.round(latencies.length / elapsed),
-      latencyMs: { p50: Number(pct(50).toFixed(1)), p95: Number(pct(95).toFixed(1)), p99: Number(pct(99).toFixed(1)), max: Number(pct(100).toFixed(1)) },
+      latencyMs: {
+        p50: Number(pct(50).toFixed(1)),
+        p95: Number(pct(95).toFixed(1)),
+        p99: Number(pct(99).toFixed(1)),
+        max: Number(pct(100).toFixed(1)),
+      },
     },
     null,
     2,

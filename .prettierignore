@@ -4,3 +4,4 @@ pnpm-lock.yaml
 data
 edison-x-builder-folder
 library/seed-designs.json
+docs/e2e-transcripts.md

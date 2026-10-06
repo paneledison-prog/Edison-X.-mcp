@@ -10,12 +10,12 @@ All commands run from the repository root (or `docker compose exec edison-x node
 
 ## API keys
 
-| Task | Command |
-|---|---|
-| Issue | `pnpm keys:create --name "<who>" --scopes search-only` (key shown once) |
-| List | `pnpm keys:list` (shows prefix, scopes, last used, never the key) |
-| Revoke | `pnpm keys:revoke <key-id>` (effective on the very next request) |
-| Rotate | issue a new key, update the agent, revoke the old one |
+| Task   | Command                                                                 |
+| ------ | ----------------------------------------------------------------------- |
+| Issue  | `pnpm keys:create --name "<who>" --scopes search-only` (key shown once) |
+| List   | `pnpm keys:list` (shows prefix, scopes, last used, never the key)       |
+| Revoke | `pnpm keys:revoke <key-id>` (effective on the very next request)        |
+| Rotate | issue a new key, update the agent, revoke the old one                   |
 
 A leaked key: revoke it, then read the audit log for what the principal did (below).
 
@@ -77,10 +77,10 @@ Events: `key_created`, `key_revoked`, `auth_denied`, `scope_denied`, `rate_limit
 
 ## Incident quick reference
 
-| Situation | Action |
-|---|---|
-| Key leaked | `keys:revoke`, review `audit_log` |
-| Hostile content got through | `design:remove <id>`, add the phrase to the rules in `src/security/sanitize.ts` with a test, check `sanitizer_flag` events |
-| Source complains or changes its terms | remove from `ENABLED_SOURCES`, `source:purge <id>`, update the register |
-| Disk or DB corruption | stop, `db:restore` the latest backup, start |
-| Server will not start | read the first error: it names the missing or invalid variable, never its value |
+| Situation                             | Action                                                                                                                     |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Key leaked                            | `keys:revoke`, review `audit_log`                                                                                          |
+| Hostile content got through           | `design:remove <id>`, add the phrase to the rules in `src/security/sanitize.ts` with a test, check `sanitizer_flag` events |
+| Source complains or changes its terms | remove from `ENABLED_SOURCES`, `source:purge <id>`, update the register                                                    |
+| Disk or DB corruption                 | stop, `db:restore` the latest backup, start                                                                                |
+| Server will not start                 | read the first error: it names the missing or invalid variable, never its value                                            |

@@ -19,16 +19,16 @@ MCP spec and SDK docs were read from the installed package's type definitions (n
 
 ## Phases
 
-| #   | Scope                                                                                                                 | Proof                                                     |
-| --- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| #   | Scope                                                                                                                 | Proof                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | 0   | Scaffold, strict TS, lint/format/test, `config.ts`, source register, fail-closed registry                             | `pnpm verify`; registry refuses a source with any blank field |
-| 1   | SQLite repository + migrations, `LibraryAdapter`, 30 seed designs, ranking, `search_inspiration`, `get_design`, stdio | MCP client contract tests; determinism test               |
-| 2   | `find_similar_designs`, `get_inspiration_brief`, `list_taxonomy`, `list_sources`                                      | Contract tests; brief cites only real ids                 |
-| 3   | Streamable HTTP, API keys, scopes, key CLI, rate limits, sanitizer, SSRF guard, redaction, audit, health              | Security suite                                            |
-| 4   | Pinterest adapter (official API v5, user OAuth, encrypted tokens)                                                     | Mocked-API integration tests; token-leak grep test        |
-| 5   | Analysis layer (async job, schema validation, backfill with cost cap and dry run)                                     | Validation, owner-protection, gating tests                |
-| 6   | Collections, `submit_design`, `get_connection_status`                                                                 | Ownership and rejection tests                             |
-| 7   | Load test, backup/restore, docs, container, audit, final checklist                                                    | `docs/CHECKLIST.md` with evidence                         |
+| 1   | SQLite repository + migrations, `LibraryAdapter`, 30 seed designs, ranking, `search_inspiration`, `get_design`, stdio | MCP client contract tests; determinism test                   |
+| 2   | `find_similar_designs`, `get_inspiration_brief`, `list_taxonomy`, `list_sources`                                      | Contract tests; brief cites only real ids                     |
+| 3   | Streamable HTTP, API keys, scopes, key CLI, rate limits, sanitizer, SSRF guard, redaction, audit, health              | Security suite                                                |
+| 4   | Pinterest adapter (official API v5, user OAuth, encrypted tokens)                                                     | Mocked-API integration tests; token-leak grep test            |
+| 5   | Analysis layer (async job, schema validation, backfill with cost cap and dry run)                                     | Validation, owner-protection, gating tests                    |
+| 6   | Collections, `submit_design`, `get_connection_status`                                                                 | Ownership and rejection tests                                 |
+| 7   | Load test, backup/restore, docs, container, audit, final checklist                                                    | `docs/CHECKLIST.md` with evidence                             |
 
 ## Design decisions
 

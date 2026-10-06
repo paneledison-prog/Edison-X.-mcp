@@ -43,17 +43,17 @@ On first start the library is seeded with 32 original starter designs (`library/
 
 ## The tools
 
-| Tool | Scope | What it does |
-|---|---|---|
-| `search_inspiration` | `read:search` | Find designs matching a description (platform, category, style, color hint) |
-| `get_design` | `read:design` | Full record with analysis; optionally the image itself when the source's terms allow |
-| `find_similar_designs` | `read:search` | More designs like one you liked |
-| `get_inspiration_brief` | `read:search` | Patterns, components, palettes and pitfalls synthesized from retrieved designs only |
-| `list_taxonomy` / `list_sources` | `read:search` | Valid categories and styles; enabled sources and their health |
-| `create_collection`, `add_to_collection` | `write:collections` | Save references per project (private to the key) |
-| `list_collections`, `get_collection` | `read:search` | Read your own collections |
-| `submit_design` | `write:library` | Add a credited, licensed design to the library |
-| `get_connection_status` | `read:search` | Connect a source that needs a person's own account (Pinterest) |
+| Tool                                     | Scope               | What it does                                                                         |
+| ---------------------------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `search_inspiration`                     | `read:search`       | Find designs matching a description (platform, category, style, color hint)          |
+| `get_design`                             | `read:design`       | Full record with analysis; optionally the image itself when the source's terms allow |
+| `find_similar_designs`                   | `read:search`       | More designs like one you liked                                                      |
+| `get_inspiration_brief`                  | `read:search`       | Patterns, components, palettes and pitfalls synthesized from retrieved designs only  |
+| `list_taxonomy` / `list_sources`         | `read:search`       | Valid categories and styles; enabled sources and their health                        |
+| `create_collection`, `add_to_collection` | `write:collections` | Save references per project (private to the key)                                     |
+| `list_collections`, `get_collection`     | `read:search`       | Read your own collections                                                            |
+| `submit_design`                          | `write:library`     | Add a credited, licensed design to the library                                       |
+| `get_connection_status`                  | `read:search`       | Connect a source that needs a person's own account (Pinterest)                       |
 
 Every result carries `source_url`, `attribution` and an `attribution_notice` reminding the agent that all text is third-party data, not instructions.
 
@@ -69,16 +69,16 @@ Every result carries `source_url`, `attribution` and an `attribution_notice` rem
 
 `docs/RUNBOOK.md` covers keys, disabling a source, removing a design (takedown), backups and restore, re-reviewing sources, rotating secrets and reading the audit log. Health: `GET /healthz` (anonymous), `GET /readyz` and `GET /metrics` (need a key; metrics need `admin`).
 
-| Command | Purpose |
-|---|---|
-| `pnpm verify` | lint, typecheck, format check, tests |
-| `pnpm build` / `pnpm start` | compile and run |
-| `pnpm keys:create / keys:list / keys:revoke` | manage API keys |
-| `pnpm library:import <file>` | bulk-add designs |
-| `pnpm design:remove <id>` / `pnpm source:purge <source>` | takedown |
-| `pnpm analysis:backfill --dry-run` | model-written analysis for designs that lack it (cost-capped) |
-| `pnpm db:backup <file>` / `db:restore <file>` | backup and restore |
-| `pnpm load:test` / `pnpm e2e:transcripts` | load test; scripted end-to-end transcripts |
+| Command                                                  | Purpose                                                       |
+| -------------------------------------------------------- | ------------------------------------------------------------- |
+| `pnpm verify`                                            | lint, typecheck, format check, tests                          |
+| `pnpm build` / `pnpm start`                              | compile and run                                               |
+| `pnpm keys:create / keys:list / keys:revoke`             | manage API keys                                               |
+| `pnpm library:import <file>`                             | bulk-add designs                                              |
+| `pnpm design:remove <id>` / `pnpm source:purge <source>` | takedown                                                      |
+| `pnpm analysis:backfill --dry-run`                       | model-written analysis for designs that lack it (cost-capped) |
+| `pnpm db:backup <file>` / `db:restore <file>`            | backup and restore                                            |
+| `pnpm load:test` / `pnpm e2e:transcripts`                | load test; scripted end-to-end transcripts                    |
 
 ## Layout
 

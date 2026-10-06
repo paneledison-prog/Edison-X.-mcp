@@ -89,11 +89,11 @@ npx @modelcontextprotocol/inspector --cli https://<your-host>/mcp --transport ht
 
 ### Scope presets (least privilege)
 
-| Preset | Scopes | Use for |
-|---|---|---|
-| `search-only` (default) | `read:search`, `read:design` | agents that only look things up |
-| `curator` | search-only + `write:library` | agents or people who add designs to the library |
-| `owner` | curator + `write:collections`, `admin` | the owner; `admin` also opens `/metrics` |
+| Preset                  | Scopes                                 | Use for                                         |
+| ----------------------- | -------------------------------------- | ----------------------------------------------- |
+| `search-only` (default) | `read:search`, `read:design`           | agents that only look things up                 |
+| `curator`               | search-only + `write:library`          | agents or people who add designs to the library |
+| `owner`                 | curator + `write:collections`, `admin` | the owner; `admin` also opens `/metrics`        |
 
 Pass a preset or a list: `--scopes read:search,read:design,write:collections`. Per-key limits: `--rate-per-min 30 --rate-per-day 500` (defaults 60 and 1,000).
 
@@ -107,14 +107,14 @@ Pinterest is available only when its entry in `docs/SOURCES.md` is complete and 
 
 ## 4. Troubleshooting
 
-| Symptom | Cause and fix |
-|---|---|
-| HTTP **401** | Missing, malformed, unknown or revoked key. Check the `Authorization: Bearer ex_...` header (no quotes, no trailing spaces). Repeated 401s from one address are throttled (429). |
-| Tool result "**lacks the required scope 'x'**" | The key is missing a scope (this is a tool error, not an HTTP 403). Issue a key with the right preset. |
-| HTTP **403** | `Host` or `Origin` not allowed. Set `PUBLIC_BASE_URL` to the host you call, and `ALLOWED_ORIGINS` for browser clients. |
-| HTTP **429** / "Rate limit reached" | Per-key limit. Wait for `Retry-After` seconds or raise the key's limits. |
-| A source shows in `sources_skipped` as **"not connected"** | That source needs the person's own account: use `get_connection_status`. |
-| `sources_skipped`: "rate limited", "timeout", "error" | The source was slow or refused; other sources still answered. Retry later; check `list_sources` health. |
-| **Empty results** | Add concrete words (screen type, mood). Filler words are ignored. The library ships 32 starter patterns; add more with `submit_design`. A source that is not approved in `docs/SOURCES.md` is not loaded (see the startup log). |
-| A source "refused: not loading" at startup | Its register entry is incomplete or older than 180 days. Fix the entry (`docs/RUNBOOK.md`). |
-| stdio client shows garbage or hangs | Something wrote to stdout. Edison X logs to stderr only; check wrappers and shell profiles. |
+| Symptom                                                    | Cause and fix                                                                                                                                                                                                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTTP **401**                                               | Missing, malformed, unknown or revoked key. Check the `Authorization: Bearer ex_...` header (no quotes, no trailing spaces). Repeated 401s from one address are throttled (429).                                                |
+| Tool result "**lacks the required scope 'x'**"             | The key is missing a scope (this is a tool error, not an HTTP 403). Issue a key with the right preset.                                                                                                                          |
+| HTTP **403**                                               | `Host` or `Origin` not allowed. Set `PUBLIC_BASE_URL` to the host you call, and `ALLOWED_ORIGINS` for browser clients.                                                                                                          |
+| HTTP **429** / "Rate limit reached"                        | Per-key limit. Wait for `Retry-After` seconds or raise the key's limits.                                                                                                                                                        |
+| A source shows in `sources_skipped` as **"not connected"** | That source needs the person's own account: use `get_connection_status`.                                                                                                                                                        |
+| `sources_skipped`: "rate limited", "timeout", "error"      | The source was slow or refused; other sources still answered. Retry later; check `list_sources` health.                                                                                                                         |
+| **Empty results**                                          | Add concrete words (screen type, mood). Filler words are ignored. The library ships 32 starter patterns; add more with `submit_design`. A source that is not approved in `docs/SOURCES.md` is not loaded (see the startup log). |
+| A source "refused: not loading" at startup                 | Its register entry is incomplete or older than 180 days. Fix the entry (`docs/RUNBOOK.md`).                                                                                                                                     |
+| stdio client shows garbage or hangs                        | Something wrote to stdout. Edison X logs to stderr only; check wrappers and shell profiles.                                                                                                                                     |
