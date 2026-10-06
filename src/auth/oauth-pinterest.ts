@@ -73,7 +73,16 @@ export class PinterestConnections implements OAuthProvider {
     if (!conn) throw new SourceError(PINTEREST_SOURCE, "not_connected");
     const expiresSoon =
       conn.expiresAt !== null && Date.parse(conn.expiresAt) - this.clock().getTime() < REFRESH_SKEW_MS;
-    if (!expiresSoon) return Promise.resolve(decryptString(this.key, conn.accessTokenEnc));
+    if (!expiresSoon) {
+      try {
+        return Promise.resolve(decryptString(this.key, conn.accessTokenEnc));
+      } catch {
+        // Stored with a different TOKEN_ENCRYPTION_KEY, or tampered with: unusable, so treat as disconnected.
+        return this.disconnect(principalId).then(() => {
+          throw new SourceError(PINTEREST_SOURCE, "not_connected");
+        });
+      }
+    }
     return this.refresh(principalId, signal);
   }
 
@@ -88,7 +97,14 @@ export class PinterestConnections implements OAuthProvider {
         throw new SourceError(PINTEREST_SOURCE, "not_connected");
       }
       try {
-        const t = await this.client.refresh(decryptString(this.key, conn.refreshTokenEnc), signal);
+        let refreshToken: string;
+        try {
+          refreshToken = decryptString(this.key, conn.refreshTokenEnc);
+        } catch {
+          await this.disconnect(principalId);
+          throw new SourceError(PINTEREST_SOURCE, "not_connected");
+        }
+        const t = await this.client.refresh(refreshToken, signal);
         this.store(principalId, t, conn);
         return t.access_token;
       } catch (err) {

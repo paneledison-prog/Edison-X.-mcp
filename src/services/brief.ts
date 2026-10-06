@@ -63,9 +63,11 @@ export function buildBrief(goal: string, platform: Platform | "any", designs: De
       });
   }
 
+  // Concrete UI patterns and components first; the generic density observation last.
+  const kind = (p: { pattern: string }): number => (p.pattern.startsWith("ui-pattern:") ? 0 : p.pattern.startsWith("component:") ? 1 : 2);
   const safePatterns = patterns
     .filter((p) => p.evidence.length >= 2 && p.evidence.every((id) => ids.has(id)))
-    .sort((a, b) => b.evidence.length - a.evidence.length || a.pattern.localeCompare(b.pattern))
+    .sort((a, b) => kind(a) - kind(b) || b.evidence.length - a.evidence.length || a.pattern.localeCompare(b.pattern))
     .slice(0, 10);
 
   const suggested = componentCounts

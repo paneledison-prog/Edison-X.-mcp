@@ -458,6 +458,40 @@ describe("tokens are refreshed, protected and deleted", () => {
   });
 });
 
+describe("key rotation and our own outbound limit", () => {
+  it("treats tokens stored under a different encryption key as disconnected instead of failing", async () => {
+    const { key, principal } = app.keys.create({ name: "u" });
+    const client = await mcpClient(http.url, key);
+    await connectPinterest(client);
+    app.repo.db.prepare("UPDATE oauth_connections SET access_token_enc = ? WHERE principal_id = ?").run(Buffer.alloc(60, 1).toString("base64"), principal.id);
+    const out = (await client.callTool({ name: "search_inspiration", arguments: { query: "dashboard", sources: ["pinterest"] } })).structuredContent as {
+      sources_skipped: Array<{ reason: string }>;
+    };
+    expect(out.sources_skipped[0]?.reason).toBe("not connected");
+    expect(app.repo.getConnection(principal.id, "pinterest")).toBeNull();
+    await client.close();
+  });
+
+  it("puts a token bucket in front of the API so a burst never reaches Pinterest", async () => {
+    const { PinterestClient } = await import("../../src/sources/pinterest/client.js");
+    const calls: string[] = [];
+    const pc = new PinterestClient({
+      clientId: "i",
+      clientSecret: "s",
+      redirectUri: "https://x.test/cb",
+      rateLimit: { burst: 3, perSecond: 1 },
+      fetcher: (url) => {
+        calls.push(url);
+        return Promise.resolve({ status: 200, headers: {}, body: Buffer.from('{"items":[]}') });
+      },
+    });
+    const results = await Promise.allSettled([1, 2, 3, 4, 5].map(() => pc.listPins("t", undefined)));
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(3);
+    expect(results.filter((r) => r.status === "rejected")).toHaveLength(2);
+    expect(calls).toHaveLength(3);
+  });
+});
+
 describe("rate limits (429)", () => {
   it("honours Retry-After: skips the source, makes no further calls during the cooldown, then resumes", async () => {
     const { key } = app.keys.create({ name: "u" });

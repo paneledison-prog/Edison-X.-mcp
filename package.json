@@ -59,6 +59,7 @@
     "analysis:backfill": "tsx src/cli/analysis-backfill.ts",
     "db:backup": "tsx src/cli/db.ts backup",
     "db:restore": "tsx src/cli/db.ts restore",
-    "load:test": "tsx scripts/load-test.ts"
+    "load:test": "tsx scripts/load-test.ts",
+    "e2e:transcripts": "tsx scripts/e2e-transcripts.ts"
   }
 }
