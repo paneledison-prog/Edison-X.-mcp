@@ -28,7 +28,13 @@ function palettePairCloseness(a: string[] | undefined, b: string[] | undefined):
   return per.reduce((s, x) => s + x, 0) / per.length;
 }
 
-export const SIMILARITY_WEIGHTS = { category: 0.35, platform: 0.1, tags: 0.3, palette: 0.1, components: 0.15 } as const;
+export const SIMILARITY_WEIGHTS = {
+  category: 0.35,
+  platform: 0.1,
+  tags: 0.3,
+  palette: 0.1,
+  components: 0.15,
+} as const;
 
 /** Deterministic similarity from shared category, tags, platform, palette closeness and components. */
 export function similarity(seed: Design, d: Design): number {
@@ -38,7 +44,8 @@ export function similarity(seed: Design, d: Design): number {
   if (seed.platform !== "unknown" && seed.platform === d.platform) s += w.platform;
   s += w.tags * jaccard(seed.tags, d.tags);
   s += w.palette * palettePairCloseness(seed.palette, d.palette);
-  if (seed.analysis && d.analysis) s += w.components * jaccard(seed.analysis.components, d.analysis.components);
+  if (seed.analysis && d.analysis)
+    s += w.components * jaccard(seed.analysis.components, d.analysis.components);
   return Math.round(s * 1e9) / 1e9;
 }
 
@@ -48,19 +55,32 @@ export class SimilarService {
     private readonly designs: DesignService,
   ) {}
 
-  async find(id: string, limit: number, sameSourceOnly: boolean, ctx: RequestContext): Promise<SimilarOutcome> {
+  async find(
+    id: string,
+    limit: number,
+    sameSourceOnly: boolean,
+    ctx: RequestContext,
+  ): Promise<SimilarOutcome> {
     const { design: seed } = await this.designs.get(id, ctx);
     const loaded = this.deps.registry.ids();
     const sources = sameSourceOnly ? [seed.source] : loaded;
     const candidates = this.deps.repo
-      .similarityCandidates(seed, { sources, limit: 100, viewer: { principalId: ctx.principal.id, now: ctx.now } })
+      .similarityCandidates(seed, {
+        sources,
+        limit: 100,
+        viewer: { principalId: ctx.principal.id, now: ctx.now },
+      })
       .filter((d) => loaded.includes(d.source));
-    const scored = dedupeBySourceUrl(candidates.map((design) => ({ design, score: similarity(seed, design) })))
+    const scored = dedupeBySourceUrl(
+      candidates.map((design) => ({ design, score: similarity(seed, design) })),
+    )
       .filter((c) => c.score > 0 && c.design.id !== seed.id)
       .sort((a, b) => b.score - a.score || a.design.id.localeCompare(b.design.id));
     const hotlink = new Map(this.deps.registry.list().map((s) => [s.adapter.id, s.capabilities.canHotlink]));
     return {
-      ranked: scored.slice(0, limit).map((s) => ({ ...s, canHotlink: hotlink.get(s.design.source) ?? false })),
+      ranked: scored
+        .slice(0, limit)
+        .map((s) => ({ ...s, canHotlink: hotlink.get(s.design.source) ?? false })),
       sourcesQueried: [...sources].sort(),
       totalEstimate: scored.length,
     };

@@ -29,18 +29,37 @@ describe("secrets never appear in logs, errors or tool output", () => {
     const logger = createLogger({ level: "debug", destination: sink });
     const db = openDatabase(":memory:");
     runMigrations(db);
-    const app = createApp(loadConfig({ TOKEN_ENCRYPTION_KEY: TEST_MASTER_KEY, DATABASE_PATH: ":memory:", LOG_LEVEL: "debug" }), {
-      logger,
-      clock: () => NOW,
-      repo: new SqliteRepository(db, logger),
-      register: parseRegister(LIBRARY_REGISTER),
-    });
+    const app = createApp(
+      loadConfig({ TOKEN_ENCRYPTION_KEY: TEST_MASTER_KEY, DATABASE_PATH: ":memory:", LOG_LEVEL: "debug" }),
+      {
+        logger,
+        clock: () => NOW,
+        repo: new SqliteRepository(db, logger),
+        register: parseRegister(LIBRARY_REGISTER),
+      },
+    );
     const http = await startHttp(app);
     const { key } = app.keys.create({ name: "planted" });
     const PLANTED = "ex_" + "Z".repeat(43);
-    await fetch(`${http.url}/mcp`, { method: "POST", headers: { ...MCP_HEADERS, Authorization: `Bearer ${PLANTED}` }, body: rpc("tools/list") });
-    await fetch(`${http.url}/mcp`, { method: "POST", headers: { ...MCP_HEADERS, Authorization: `Bearer ${key}` }, body: rpc("tools/list") });
-    app.logger.info({ authorization: `Bearer ${key}`, access_token: "tok_planted_123", nested: { client_secret: "shh-planted" }, msg2: `token ${key}` }, `leak? ${key}`);
+    await fetch(`${http.url}/mcp`, {
+      method: "POST",
+      headers: { ...MCP_HEADERS, Authorization: `Bearer ${PLANTED}` },
+      body: rpc("tools/list"),
+    });
+    await fetch(`${http.url}/mcp`, {
+      method: "POST",
+      headers: { ...MCP_HEADERS, Authorization: `Bearer ${key}` },
+      body: rpc("tools/list"),
+    });
+    app.logger.info(
+      {
+        authorization: `Bearer ${key}`,
+        access_token: "tok_planted_123",
+        nested: { client_secret: "shh-planted" },
+        msg2: `token ${key}`,
+      },
+      `leak? ${key}`,
+    );
     app.audit.record("key_created", null, { token: "audit-planted-token", note: `key ${key}` });
     await http.close();
     await new Promise((r) => setTimeout(r, 50));
@@ -56,14 +75,44 @@ describe("secrets never appear in logs, errors or tool output", () => {
 
 describe("no scraping and no disallowed sources", () => {
   const BANNED_PACKAGES = [
-    "puppeteer", "puppeteer-core", "puppeteer-extra", "playwright", "playwright-core", "@playwright/test", "cheerio", "jsdom", "selenium-webdriver",
-    "webdriverio", "nightmare", "x-ray", "crawlee", "apify", "apify-client", "scrapingbee", "scraperapi", "pinterest-api", "node-pinterest", "pinterest-scraper",
-    "pinterest-dl", "pinterest-downloader", "got-scraping", "scrapy", "request-promise",
+    "puppeteer",
+    "puppeteer-core",
+    "puppeteer-extra",
+    "playwright",
+    "playwright-core",
+    "@playwright/test",
+    "cheerio",
+    "jsdom",
+    "selenium-webdriver",
+    "webdriverio",
+    "nightmare",
+    "x-ray",
+    "crawlee",
+    "apify",
+    "apify-client",
+    "scrapingbee",
+    "scraperapi",
+    "pinterest-api",
+    "node-pinterest",
+    "pinterest-scraper",
+    "pinterest-dl",
+    "pinterest-downloader",
+    "got-scraping",
+    "scrapy",
+    "request-promise",
   ];
 
   it("package.json declares no scraping or unofficial-client dependency", () => {
-    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as Record<string, Record<string, string> | undefined>;
-    const declared = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies, ...pkg.optionalDependencies, ...pkg.peerDependencies });
+    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as Record<
+      string,
+      Record<string, string> | undefined
+    >;
+    const declared = Object.keys({
+      ...pkg.dependencies,
+      ...pkg.devDependencies,
+      ...pkg.optionalDependencies,
+      ...pkg.peerDependencies,
+    });
     expect(declared.filter((d) => BANNED_PACKAGES.includes(d.toLowerCase()))).toEqual([]);
   });
 
@@ -74,11 +123,18 @@ describe("no scraping and no disallowed sources", () => {
       const text = readFileSync(f, "utf8");
       for (const m of text.matchAll(/(?:from|import|require\()\s*["']([^"']+)["']/g)) {
         const spec = (m[1] ?? "").toLowerCase();
-        expect(BANNED_PACKAGES.some((b) => spec === b || spec.startsWith(`${b}/`)), `${f} imports ${spec}`).toBe(false);
+        expect(
+          BANNED_PACKAGES.some((b) => spec === b || spec.startsWith(`${b}/`)),
+          `${f} imports ${spec}`,
+        ).toBe(false);
       }
-      expect(text, `${f} uses an unofficial Pinterest endpoint`).not.toMatch(/pinterest\.com\/(resource|_ngjs|v3|ajax)|BaseSearchResource|\/resource\/[A-Za-z]+Resource/);
+      expect(text, `${f} uses an unofficial Pinterest endpoint`).not.toMatch(
+        /pinterest\.com\/(resource|_ngjs|v3|ajax)|BaseSearchResource|\/resource\/[A-Za-z]+Resource/,
+      );
       for (const m of text.matchAll(/https:\/\/([a-z0-9.-]*pinterest\.com)/gi)) {
-        expect(["api.pinterest.com", "www.pinterest.com"], `${f} contacts ${m[1]}`).toContain((m[1] ?? "").toLowerCase());
+        expect(["api.pinterest.com", "www.pinterest.com"], `${f} contacts ${m[1]}`).toContain(
+          (m[1] ?? "").toLowerCase(),
+        );
       }
     }
   });
@@ -93,6 +149,8 @@ describe("no scraping and no disallowed sources", () => {
 
   it("the shipped register contains no BLOCKED entry that is also enabled, and every enabled source is approved", () => {
     const reg = parseRegister(readFileSync("docs/SOURCES.md", "utf8"));
-    for (const [id, entry] of reg) if (entry["Status"] === "BLOCKED") expect(loadConfig({ TOKEN_ENCRYPTION_KEY: TEST_MASTER_KEY }).enabledSources).not.toContain(id);
+    for (const [id, entry] of reg)
+      if (entry["Status"] === "BLOCKED")
+        expect(loadConfig({ TOKEN_ENCRYPTION_KEY: TEST_MASTER_KEY }).enabledSources).not.toContain(id);
   });
 });

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { decryptString, deriveKey, encryptString, signPayload, verifyPayload } from "../../src/security/crypto.js";
+import {
+  decryptString,
+  deriveKey,
+  encryptString,
+  signPayload,
+  verifyPayload,
+} from "../../src/security/crypto.js";
 import { redactString, redactValue } from "../../src/security/redact.js";
 import { TEST_MASTER_KEY } from "../helpers/fixtures.js";
 
@@ -39,7 +45,9 @@ describe("redaction", () => {
     expect(redactString("https://x/cb?code=abc123&state=s")).toContain("code=[REDACTED]");
   });
   it("masks sensitive keys deeply but keeps safe identifiers", () => {
-    const out = redactValue({ a: { access_token: "t", Authorization: "Bearer z", key_prefix: "ex_ab12", list: [{ password: "p" }] } }) as {
+    const out = redactValue({
+      a: { access_token: "t", Authorization: "Bearer z", key_prefix: "ex_ab12", list: [{ password: "p" }] },
+    }) as {
       a: Record<string, unknown>;
     };
     expect(out.a.access_token).toBe("[REDACTED]");

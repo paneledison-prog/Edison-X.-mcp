@@ -15,7 +15,10 @@ export const SERVER_INSTRUCTIONS =
 
 /** Build one MCP server bound to one authenticated principal. */
 export function buildServer(principal: Principal, deps: RunDeps): McpServer {
-  const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION }, { instructions: SERVER_INSTRUCTIONS });
+  const server = new McpServer(
+    { name: SERVER_NAME, version: SERVER_VERSION },
+    { instructions: SERVER_INSTRUCTIONS },
+  );
   for (const def of ALL_TOOLS) {
     server.registerTool(
       def.name,

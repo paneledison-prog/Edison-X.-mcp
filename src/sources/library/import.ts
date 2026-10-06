@@ -28,7 +28,10 @@ export interface ImportOptions {
  * Sanitize and store owner-provided designs. Each item needs a license and an https source URL;
  * owner-written analysis is stamped `generatedBy: "owner"`.
  */
-export function importLibraryDesigns(items: Array<Record<string, unknown>>, opts: ImportOptions): ImportResult {
+export function importLibraryDesigns(
+  items: Array<Record<string, unknown>>,
+  opts: ImportOptions,
+): ImportResult {
   const result: ImportResult = { imported: 0, rejected: [] };
   for (const item of items) {
     const sourceId = typeof item.sourceId === "string" ? item.sourceId : "(missing)";
@@ -38,19 +41,31 @@ export function importLibraryDesigns(items: Array<Record<string, unknown>>, opts
     }
     const raw: RawDesign = { ...item };
     if (raw.analysis && typeof raw.analysis === "object") {
-      raw.analysis = { generatedBy: "owner", generatedAt: opts.now.toISOString(), ...(raw.analysis) };
+      raw.analysis = { generatedBy: "owner", generatedAt: opts.now.toISOString(), ...raw.analysis };
     }
+    let flagged = false;
     const sanitized = sanitizeDesign(raw, {
       adapter: opts.adapter,
       now: opts.now,
       categories: CATEGORY_SET,
-      onFlag: opts.onFlag,
+      onFlag: (e) => {
+        flagged = true;
+        opts.onFlag?.(e);
+      },
     });
     if (!sanitized.ok) {
       result.rejected.push({ sourceId, reason: sanitized.reason });
       continue;
     }
-    opts.repo.upsertDesign({ ...sanitized.design, expiresAt: undefined }, { submittedBy: opts.submittedBy ?? null });
+    // Owner content that trips the instruction filter is rejected, not stored with a placeholder.
+    if (flagged) {
+      result.rejected.push({ sourceId, reason: "safety_filter" });
+      continue;
+    }
+    opts.repo.upsertDesign(
+      { ...sanitized.design, expiresAt: undefined },
+      { submittedBy: opts.submittedBy ?? null },
+    );
     result.imported += 1;
   }
   return result;

@@ -18,7 +18,12 @@ export const listTaxonomy: ToolDefinition<typeof inputSchema> = {
     platforms: z.array(z.string()),
     ui_patterns: z.array(z.string()),
   }),
-  annotations: { title: "List the design vocabulary", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    title: "List the design vocabulary",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   handler() {
     return Promise.resolve({ data: { ...getTaxonomy() } });
   },

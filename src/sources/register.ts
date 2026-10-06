@@ -33,7 +33,16 @@ export interface RegisterEntry {
   reviewedBy: string;
   termsSummary: string;
   aiMlRule: string;
-  capabilities: Pick<SourceCapabilities, "canSearch" | "canGetById" | "canStoreMetadata" | "canAnalyze" | "canHotlink" | "canProxyImage" | "cacheTtlSeconds">;
+  capabilities: Pick<
+    SourceCapabilities,
+    | "canSearch"
+    | "canGetById"
+    | "canStoreMetadata"
+    | "canAnalyze"
+    | "canHotlink"
+    | "canProxyImage"
+    | "cacheTtlSeconds"
+  >;
   attribution: string;
   rateLimits: string;
   ownerApproval: string;
@@ -71,7 +80,8 @@ export function parseRegister(markdown: string): Map<string, RawEntry> {
       current[currentKey] = (field[2] as string).trim();
       continue;
     }
-    if (currentKey && /^\s+\S/.test(line)) current[currentKey] = `${current[currentKey] ?? ""} ${line.trim()}`.trim();
+    if (currentKey && /^\s+\S/.test(line))
+      current[currentKey] = `${current[currentKey] ?? ""} ${line.trim()}`.trim();
   }
   return entries;
 }
@@ -101,7 +111,8 @@ function parseCapabilities(raw: string): { caps?: RegisterEntry["capabilities"];
     caps[flag] = v === "true";
   }
   const ttl = map.get("cacheTtlSeconds");
-  if (ttl === undefined || !/^\d+$/.test(ttl)) return { problem: "Capabilities: cacheTtlSeconds must be a non-negative integer" };
+  if (ttl === undefined || !/^\d+$/.test(ttl))
+    return { problem: "Capabilities: cacheTtlSeconds must be a non-negative integer" };
   caps.cacheTtlSeconds = Number(ttl);
   return { caps: caps as unknown as RegisterEntry["capabilities"] };
 }
@@ -112,10 +123,12 @@ export type EntryValidation = { ok: true; entry: RegisterEntry } | { ok: false; 
 export function validateEntry(id: string, raw: RawEntry | undefined, now: Date): EntryValidation {
   if (!raw) return { ok: false, problems: ["no entry in the source register"] };
   const problems: string[] = [];
-  for (const f of REQUIRED_FIELDS) if (isBlank(raw[f])) problems.push(`field '${f}' is blank or a placeholder`);
+  for (const f of REQUIRED_FIELDS)
+    if (isBlank(raw[f])) problems.push(`field '${f}' is blank or a placeholder`);
 
   const status = SourceStatusSchema.safeParse(raw["Status"]?.trim());
-  if (!status.success && !isBlank(raw["Status"])) problems.push("Status must be APPROVED, USER_OAUTH, OWN_LIBRARY or BLOCKED");
+  if (!status.success && !isBlank(raw["Status"]))
+    problems.push("Status must be APPROVED, USER_OAUTH, OWN_LIBRARY or BLOCKED");
 
   let reviewedOn = "";
   let reviewedBy = "";
@@ -129,7 +142,8 @@ export function validateEntry(id: string, raw: RawEntry | undefined, now: Date):
       if (Number.isNaN(t)) problems.push("Terms reviewed on is not a valid date");
       else {
         const ageDays = (now.getTime() - t) / 86_400_000;
-        if (ageDays > REVIEW_MAX_AGE_DAYS) problems.push(`terms review is ${Math.floor(ageDays)} days old (limit ${REVIEW_MAX_AGE_DAYS})`);
+        if (ageDays > REVIEW_MAX_AGE_DAYS)
+          problems.push(`terms review is ${Math.floor(ageDays)} days old (limit ${REVIEW_MAX_AGE_DAYS})`);
         if (ageDays < -1) problems.push("terms review date is in the future");
       }
       if (isBlank(reviewedBy)) problems.push("Terms reviewed on must name the reviewer");
@@ -147,7 +161,8 @@ export function validateEntry(id: string, raw: RawEntry | undefined, now: Date):
     caps = r.caps;
   }
 
-  if (problems.length > 0 || !status.success || !caps) return { ok: false, problems: problems.length ? problems : ["invalid entry"] };
+  if (problems.length > 0 || !status.success || !caps)
+    return { ok: false, problems: problems.length ? problems : ["invalid entry"] };
   return {
     ok: true,
     entry: {

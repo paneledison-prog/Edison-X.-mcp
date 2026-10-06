@@ -1,6 +1,6 @@
 # Creator profile with stats and content tabs
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** profile
 - **Platform:** web

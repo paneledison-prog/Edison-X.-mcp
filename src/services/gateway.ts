@@ -12,7 +12,11 @@ export interface GatewaySearchResult {
   cached: boolean;
 }
 
-function withTimeout<T>(work: (signal: AbortSignal) => Promise<T>, ms: number, parent: AbortSignal): Promise<T> {
+function withTimeout<T>(
+  work: (signal: AbortSignal) => Promise<T>,
+  ms: number,
+  parent: AbortSignal,
+): Promise<T> {
   const signal = AbortSignal.any([parent, AbortSignal.timeout(ms)]);
   return new Promise<T>((resolve, reject) => {
     const onAbort = (): void => reject(new TimeoutError());
@@ -49,27 +53,41 @@ export class SourceGateway {
     const out: Design[] = [];
     for (const raw of raws) {
       const r = sanitizeDesign(raw, {
-        adapter: { id: src.adapter.id, attributionTemplate: src.adapter.attributionTemplate, capabilities: src.capabilities, ownerContent: src.adapter.ownerContent },
+        adapter: {
+          id: src.adapter.id,
+          attributionTemplate: src.adapter.attributionTemplate,
+          capabilities: src.capabilities,
+          ownerContent: src.adapter.ownerContent,
+        },
         now: ctx.now,
         categories: CATEGORY_SET,
         onFlag: (e) => {
-          this.deps.audit.record("sanitizer_flag", ctx.principal.id, { source: src.adapter.id, field: e.field, rule: e.rule });
+          this.deps.audit.record("sanitizer_flag", ctx.principal.id, {
+            source: src.adapter.id,
+            field: e.field,
+            rule: e.rule,
+          });
         },
       });
       if (r.ok) out.push(r.design);
-      else this.deps.metrics.inc("edison_sanitizer_rejects_total", { source: src.adapter.id, reason: r.reason });
+      else
+        this.deps.metrics.inc("edison_sanitizer_rejects_total", { source: src.adapter.id, reason: r.reason });
     }
     return out;
   }
 
   private shouldStore(src: LoadedSource): boolean {
-    return !src.adapter.ownerContent && src.capabilities.canStoreMetadata && src.capabilities.cacheTtlSeconds > 0;
+    return (
+      !src.adapter.ownerContent && src.capabilities.canStoreMetadata && src.capabilities.cacheTtlSeconds > 0
+    );
   }
 
   private store(src: LoadedSource, designs: Design[], ctx: RequestContext): void {
     if (!this.shouldStore(src)) return;
     for (const d of designs) {
-      this.deps.repo.upsertDesign(d, { ownerPrincipalId: src.capabilities.requiresUserAuth ? ctx.principal.id : null });
+      this.deps.repo.upsertDesign(d, {
+        ownerPrincipalId: src.capabilities.requiresUserAuth ? ctx.principal.id : null,
+      });
     }
   }
 
@@ -78,13 +96,24 @@ export class SourceGateway {
     const { repo, metrics } = this.deps;
     const caching = this.shouldStore(src);
     const cacheKey = sha256Hex(
-      JSON.stringify([id, src.capabilities.requiresUserAuth ? ctx.principal.id : "", q.text, q.platform, q.category, q.styles, q.colorHint, q.limit]),
+      JSON.stringify([
+        id,
+        src.capabilities.requiresUserAuth ? ctx.principal.id : "",
+        q.text,
+        q.platform,
+        q.category,
+        q.styles,
+        q.colorHint,
+        q.limit,
+      ]),
     );
     if (caching) {
       const hit = repo.getSourceCache(cacheKey, ctx.now);
       if (hit) {
         const viewer = { principalId: ctx.principal.id, now: ctx.now };
-        const designs = hit.designIds.map((d) => repo.getDesign(d, viewer)).filter((d): d is Design => d !== null);
+        const designs = hit.designIds
+          .map((d) => repo.getDesign(d, viewer))
+          .filter((d): d is Design => d !== null);
         metrics.inc("edison_cache_requests_total", { source: id, result: "hit" });
         return { designs, totalEstimate: hit.totalEstimate ?? undefined, cached: true };
       }
@@ -125,7 +154,11 @@ export class SourceGateway {
   async getById(src: LoadedSource, sourceId: string, ctx: RequestContext): Promise<Design | null> {
     const id = src.adapter.id;
     try {
-      const raw = await withTimeout((signal) => src.adapter.getById(sourceId, { ...ctx, signal }), this.deps.sourceTimeoutMs, ctx.signal);
+      const raw = await withTimeout(
+        (signal) => src.adapter.getById(sourceId, { ...ctx, signal }),
+        this.deps.sourceTimeoutMs,
+        ctx.signal,
+      );
       this.deps.registry.health.record(id, true);
       if (!raw) return null;
       const [design] = this.sanitizeAll(src, [{ ...raw, sourceId }], ctx);

@@ -1,6 +1,6 @@
 # Now playing screen with queue
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** media-player
 - **Platform:** ios

@@ -1,6 +1,6 @@
 # Messaging app with conversation list and thread
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** messaging
 - **Platform:** desktop

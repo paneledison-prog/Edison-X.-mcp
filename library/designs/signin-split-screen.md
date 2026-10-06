@@ -1,6 +1,6 @@
 # Sign-in with brand panel and form
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** sign-in
 - **Platform:** web

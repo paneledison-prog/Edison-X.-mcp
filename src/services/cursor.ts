@@ -21,7 +21,13 @@ export class CursorCodec {
 
   decode(cursor: string, queryHash: string, principalId: string, now = Date.now()): CursorBody {
     const payload = verifyPayload(this.key, cursor, now);
-    if (!payload || payload.h !== queryHash || payload.p !== principalId || typeof payload.o !== "number" || payload.o < 0) {
+    if (
+      !payload ||
+      payload.h !== queryHash ||
+      payload.p !== principalId ||
+      typeof payload.o !== "number" ||
+      payload.o < 0
+    ) {
       throw new ValidationError("The cursor is invalid, expired, or belongs to a different search.");
     }
     return { offset: payload.o };

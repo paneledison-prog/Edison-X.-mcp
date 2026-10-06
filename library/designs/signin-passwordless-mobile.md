@@ -1,6 +1,6 @@
 # Passwordless mobile sign-in with code entry
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** sign-in
 - **Platform:** ios

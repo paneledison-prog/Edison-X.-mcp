@@ -38,7 +38,12 @@ export class OAuthService {
   begin(source: string, principalId: string): string {
     const provider = this.provider(source);
     const state = randomToken(32);
-    this.repo.saveOAuthState(sha256Hex(state), principalId, source, new Date(this.clock().getTime() + STATE_TTL_MS));
+    this.repo.saveOAuthState(
+      sha256Hex(state),
+      principalId,
+      source,
+      new Date(this.clock().getTime() + STATE_TTL_MS),
+    );
     return provider.authorizeUrl(state);
   }
 

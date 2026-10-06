@@ -14,7 +14,13 @@ export const createCollection: ToolDefinition<typeof inputSchema> = {
   scope: "write:collections",
   inputSchema,
   outputSchema: z.object({ id: z.string() }),
-  annotations: { title: "Create a collection", readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  annotations: {
+    title: "Create a collection",
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: false,
+    openWorldHint: false,
+  },
   handler(args, ctx) {
     return Promise.resolve({ data: ctx.services.collections.create(args.name, ctx) });
   },

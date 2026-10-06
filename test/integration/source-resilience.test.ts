@@ -11,15 +11,32 @@ afterEach(async () => {
   app.close();
 });
 
-const raw = (id: string) => ({ sourceId: id, sourceUrl: `https://example.com/p/${id}`, title: `Dark dashboard ${id}`, tags: ["dashboard"], platform: "web" });
+const raw = (id: string) => ({
+  sourceId: id,
+  sourceUrl: `https://example.com/p/${id}`,
+  title: `Dark dashboard ${id}`,
+  tags: ["dashboard"],
+  platform: "web",
+});
 
 describe("sources fail independently", () => {
   it("one failing source never fails the call", async () => {
-    const boom = fakeAdapter("boom", { search: () => Promise.reject(new Error("db password=hunter2 leaked")) });
-    const limited = fakeAdapter("limited", { search: () => Promise.reject(new SourceError("limited", "rate_limited")) });
-    app = testApp({ adapters: [boom, limited], registerMarkdown: entryMarkdown("boom") + entryMarkdown("limited") });
+    const boom = fakeAdapter("boom", {
+      search: () => Promise.reject(new Error("db password=hunter2 leaked")),
+    });
+    const limited = fakeAdapter("limited", {
+      search: () => Promise.reject(new SourceError("limited", "rate_limited")),
+    });
+    app = testApp({
+      adapters: [boom, limited],
+      registerMarkdown: entryMarkdown("boom") + entryMarkdown("limited"),
+    });
     c = await connect(app);
-    const out = await c.data<{ results: unknown[]; sources_queried: string[]; sources_skipped: Array<{ source: string; reason: string }> }>("search_inspiration", { query: "dashboard" });
+    const out = await c.data<{
+      results: unknown[];
+      sources_queried: string[];
+      sources_skipped: Array<{ source: string; reason: string }>;
+    }>("search_inspiration", { query: "dashboard" });
     expect(out.results.length).toBeGreaterThan(0);
     expect(out.sources_queried).toEqual(["library"]);
     expect(out.sources_skipped).toEqual([
@@ -32,10 +49,17 @@ describe("sources fail independently", () => {
 
   it("times out a slow source after the per-source limit and still answers", async () => {
     const slow = fakeAdapter("slow", { search: () => new Promise(() => undefined) });
-    app = testApp({ adapters: [slow], registerMarkdown: entryMarkdown("slow"), env: { SOURCE_TIMEOUT_MS: "150" } });
+    app = testApp({
+      adapters: [slow],
+      registerMarkdown: entryMarkdown("slow"),
+      env: { SOURCE_TIMEOUT_MS: "150" },
+    });
     c = await connect(app);
     const started = Date.now();
-    const out = await c.data<{ results: unknown[]; sources_skipped: Array<{ source: string; reason: string }> }>("search_inspiration", { query: "dashboard" });
+    const out = await c.data<{
+      results: unknown[];
+      sources_skipped: Array<{ source: string; reason: string }>;
+    }>("search_inspiration", { query: "dashboard" });
     expect(Date.now() - started).toBeLessThan(2000);
     expect(out.sources_skipped).toEqual([{ source: "slow", reason: "timeout" }]);
     expect(out.results.length).toBeGreaterThan(0);
@@ -51,13 +75,31 @@ describe("sources fail independently", () => {
   });
 
   it("merges and de-duplicates results across sources by canonical source URL, keeping the richer record", async () => {
-    const a = fakeAdapter("aaa", { search: () => Promise.resolve({ designs: [{ ...raw("1"), sourceUrl: "https://example.com/same?utm_source=x", summary: "short" }] }) });
+    const a = fakeAdapter("aaa", {
+      search: () =>
+        Promise.resolve({
+          designs: [{ ...raw("1"), sourceUrl: "https://example.com/same?utm_source=x", summary: "short" }],
+        }),
+    });
     const b = fakeAdapter("bbb", {
-      search: () => Promise.resolve({ designs: [{ ...raw("2"), sourceUrl: "https://EXAMPLE.com/same/", summary: "a longer summary with more detail", tags: ["dashboard", "dark", "charts"] }] }),
+      search: () =>
+        Promise.resolve({
+          designs: [
+            {
+              ...raw("2"),
+              sourceUrl: "https://EXAMPLE.com/same/",
+              summary: "a longer summary with more detail",
+              tags: ["dashboard", "dark", "charts"],
+            },
+          ],
+        }),
     });
     app = testApp({ adapters: [a, b], registerMarkdown: entryMarkdown("aaa") + entryMarkdown("bbb") });
     c = await connect(app);
-    const out = await c.data<{ results: Array<{ id: string }> }>("search_inspiration", { query: "dark dashboard", sources: ["aaa", "bbb"] });
+    const out = await c.data<{ results: Array<{ id: string }> }>("search_inspiration", {
+      query: "dark dashboard",
+      sources: ["aaa", "bbb"],
+    });
     expect(out.results.map((r) => r.id)).toEqual(["bbb:2"]);
   });
 
@@ -84,7 +126,8 @@ describe("sources fail independently", () => {
     let calls = 0;
     const ext = fakeAdapter("ext", { search: () => Promise.resolve({ designs: (calls++, [raw("n1")]) }) });
     const md = entryMarkdown("ext", {
-      Capabilities: "canSearch=true, canGetById=true, canStoreMetadata=false, canAnalyze=false, canHotlink=false, canProxyImage=false, cacheTtlSeconds=0",
+      Capabilities:
+        "canSearch=true, canGetById=true, canStoreMetadata=false, canAnalyze=false, canHotlink=false, canProxyImage=false, cacheTtlSeconds=0",
     });
     app = testApp({ adapters: [ext], registerMarkdown: md });
     c = await connect(app);
@@ -95,9 +138,14 @@ describe("sources fail independently", () => {
   });
 
   it("get_design falls back to the source for ids it does not have, and refuses sources that cannot look up by id", async () => {
-    const ext = fakeAdapter("ext", { getById: (id) => Promise.resolve(id === "known" ? raw("known") : null) });
+    const ext = fakeAdapter("ext", {
+      getById: (id) => Promise.resolve(id === "known" ? raw("known") : null),
+    });
     const noGet = fakeAdapter("noget", {}, { canGetById: false });
-    app = testApp({ adapters: [ext, noGet], registerMarkdown: entryMarkdown("ext") + entryMarkdown("noget") });
+    app = testApp({
+      adapters: [ext, noGet],
+      registerMarkdown: entryMarkdown("ext") + entryMarkdown("noget"),
+    });
     c = await connect(app);
     expect((await c.data<{ id: string }>("get_design", { id: "ext:known" })).id).toBe("ext:known");
     expect((await c.call("get_design", { id: "ext:unknown" })).isError).toBe(true);

@@ -23,7 +23,10 @@ export class DesignService {
 
   static parseId(id: string): { source: string; sourceId: string } {
     const m = ID_RE.exec(id);
-    if (!m) throw new ValidationError("The design id must look like '<source>:<id>', for example 'library:fitness-dashboard-dark'.");
+    if (!m)
+      throw new ValidationError(
+        "The design id must look like '<source>:<id>', for example 'library:fitness-dashboard-dark'.",
+      );
     return { source: m[1] as string, sourceId: m[2] as string };
   }
 
@@ -47,7 +50,9 @@ export class DesignService {
   /** Only when the register grants `canProxyImage`; otherwise explain why nothing was returned. */
   async image(lookup: DesignLookup, ctx: RequestContext): Promise<ImageResult> {
     if (!lookup.source.capabilities.canProxyImage) {
-      return { note: "Image not returned: this source's terms do not allow image proxying. Use source_url to view the original." };
+      return {
+        note: "Image not returned: this source's terms do not allow image proxying. Use source_url to view the original.",
+      };
     }
     if (!lookup.design.imageUrl) return { note: "Image not returned: this design has no image." };
     return this.imageFetcher(lookup.design.imageUrl, lookup.source.adapter.allowedHosts, ctx.signal);

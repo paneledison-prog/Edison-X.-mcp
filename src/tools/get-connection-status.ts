@@ -19,7 +19,12 @@ export const getConnectionStatus: ToolDefinition<typeof inputSchema> = {
     connect_url: z.string().optional(),
     notes: z.string().optional(),
   }),
-  annotations: { title: "Check a source connection", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    title: "Check a source connection",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   async handler(args, ctx) {
     return { data: { ...(await ctx.services.connections.status(args.source, ctx)) } };
   },

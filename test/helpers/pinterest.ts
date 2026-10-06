@@ -8,7 +8,8 @@ export const fixture = (name: string): string => readFileSync(`test/fixtures/pin
 export const PINTEREST_REGISTER = (overrides: Record<string, string | null> = {}): string =>
   entryMarkdown("pinterest", {
     Status: "USER_OAUTH",
-    Capabilities: "canSearch=true, canGetById=true, canStoreMetadata=true, canAnalyze=false, canHotlink=true, canProxyImage=false, cacheTtlSeconds=3600",
+    Capabilities:
+      "canSearch=true, canGetById=true, canStoreMetadata=true, canAnalyze=false, canHotlink=true, canProxyImage=false, cacheTtlSeconds=3600",
     ...overrides,
   });
 
@@ -47,14 +48,22 @@ export class FakePinterest {
     const body = typeof opts.body === "string" ? opts.body : opts.body?.toString();
     this.calls.push({ method: opts.method ?? "GET", url, headers, body, allowedHosts: opts.allowedHosts });
     const forcedIdx = this.forced.findIndex((f) => url.includes(f.match));
-    if (forcedIdx !== -1) return Promise.resolve((this.forced.splice(forcedIdx, 1)[0] as { res: RawResponse }).res);
+    if (forcedIdx !== -1)
+      return Promise.resolve((this.forced.splice(forcedIdx, 1)[0] as { res: RawResponse }).res);
     if (url.endsWith("/v5/oauth/token")) {
-      const idx = Math.min(this.calls.filter((c) => c.url.endsWith("/oauth/token")).length - 1, this.tokenResponses.length - 1);
+      const idx = Math.min(
+        this.calls.filter((c) => c.url.endsWith("/oauth/token")).length - 1,
+        this.tokenResponses.length - 1,
+      );
       return Promise.resolve(json(this.tokenResponses[idx] as string));
     }
     const auth = /^Bearer (.+)$/.exec(headers["Authorization"] ?? "")?.[1];
-    if (!auth || !this.validAccess.has(auth)) return Promise.resolve(json({ code: 2, message: "Authentication failed." }, 401));
-    if (url.includes("/v5/pins?")) return Promise.resolve(json(url.includes("bookmark=bm2") ? fixture("pins-page2.json") : fixture("pins-page1.json")));
+    if (!auth || !this.validAccess.has(auth))
+      return Promise.resolve(json({ code: 2, message: "Authentication failed." }, 401));
+    if (url.includes("/v5/pins?"))
+      return Promise.resolve(
+        json(url.includes("bookmark=bm2") ? fixture("pins-page2.json") : fixture("pins-page1.json")),
+      );
     const pin = /\/v5\/pins\/([^/?]+)$/.exec(url)?.[1];
     if (pin === "1001") return Promise.resolve(json(fixture("pin-1001.json")));
     if (pin) return Promise.resolve(json({ code: 404, message: "Pin not found." }, 404));

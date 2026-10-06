@@ -1,15 +1,7 @@
 /** Typed errors. Every client-visible message is produced by `toClientError`, nowhere else. */
 
 export type ErrorCode =
-  | "auth"
-  | "scope"
-  | "rate_limit"
-  | "validation"
-  | "not_found"
-  | "source"
-  | "config"
-  | "timeout"
-  | "internal";
+  "auth" | "scope" | "rate_limit" | "validation" | "not_found" | "source" | "config" | "timeout" | "internal";
 
 export class EdisonError extends Error {
   constructor(

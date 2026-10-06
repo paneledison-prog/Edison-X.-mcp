@@ -32,7 +32,7 @@ function isPrivateV4(ip: string): boolean {
   const n = ipv4ToInt(ip);
   return V4_BLOCKS.some(([base, bits]) => {
     const mask = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
-    return ((n & mask) >>> 0) === ((ipv4ToInt(base) & mask) >>> 0);
+    return (n & mask) >>> 0 === (ipv4ToInt(base) & mask) >>> 0;
   });
 }
 
@@ -122,7 +122,10 @@ export function hostMatches(host: string, allowed: readonly string[]): boolean {
 }
 
 /** Static URL checks (no DNS). Returns the parsed URL or the reason for rejection. */
-export function checkUrl(input: string, opts: UrlCheckOptions = {}): { ok: true; url: URL } | { ok: false; reason: UrlRejection } {
+export function checkUrl(
+  input: string,
+  opts: UrlCheckOptions = {},
+): { ok: true; url: URL } | { ok: false; reason: UrlRejection } {
   let url: URL;
   try {
     url = new URL(input);
@@ -135,6 +138,7 @@ export function checkUrl(input: string, opts: UrlCheckOptions = {}): { ok: true;
   const host = url.hostname.replace(/^\[|\]$/g, "");
   if (isIP(host) !== 0) return { ok: false, reason: "ip_literal" };
   if (isBlockedHostname(host)) return { ok: false, reason: "blocked_host" };
-  if (opts.allowedHosts && !hostMatches(host, opts.allowedHosts)) return { ok: false, reason: "host_not_allowed" };
+  if (opts.allowedHosts && !hostMatches(host, opts.allowedHosts))
+    return { ok: false, reason: "host_not_allowed" };
   return { ok: true, url };
 }

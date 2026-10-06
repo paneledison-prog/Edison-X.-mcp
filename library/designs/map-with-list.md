@@ -1,6 +1,6 @@
 # Map discovery with synced result list
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** maps
 - **Platform:** web

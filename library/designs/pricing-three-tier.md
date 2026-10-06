@@ -1,6 +1,6 @@
 # Three-tier pricing table with toggle
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** pricing
 - **Platform:** web

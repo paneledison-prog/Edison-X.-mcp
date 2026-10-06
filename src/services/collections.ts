@@ -24,12 +24,20 @@ export class CollectionService {
 
   create(name: string, ctx: RequestContext): { id: string } {
     const clean = sanitizeText(name, "collection.name", 80);
-    if (!clean) throw new ValidationError("The collection name is empty or was rejected by the safety filter.");
+    if (!clean)
+      throw new ValidationError("The collection name is empty or was rejected by the safety filter.");
     if (this.deps.repo.listCollections(ctx.principal.id).length >= MAX_COLLECTIONS_PER_PRINCIPAL) {
-      throw new ValidationError(`You already have ${MAX_COLLECTIONS_PER_PRINCIPAL} collections, which is the limit.`);
+      throw new ValidationError(
+        `You already have ${MAX_COLLECTIONS_PER_PRINCIPAL} collections, which is the limit.`,
+      );
     }
     const id = `col_${randomBytes(6).toString("hex")}`;
-    this.deps.repo.createCollection({ id, ownerPrincipalId: ctx.principal.id, name: clean, createdAt: ctx.now.toISOString() });
+    this.deps.repo.createCollection({
+      id,
+      ownerPrincipalId: ctx.principal.id,
+      name: clean,
+      createdAt: ctx.now.toISOString(),
+    });
     this.deps.audit.record("collection_created", ctx.principal.id, { collection: id });
     return { id };
   }
@@ -37,11 +45,16 @@ export class CollectionService {
   /** Not-found and not-yours look identical so ids cannot be probed. */
   private owned(collectionId: string, ctx: RequestContext): { id: string; name: string; createdAt: string } {
     const c = this.deps.repo.getCollection(collectionId);
-    if (!c || c.ownerPrincipalId !== ctx.principal.id) throw new NotFoundError("No collection with that id was found for you.");
+    if (!c || c.ownerPrincipalId !== ctx.principal.id)
+      throw new NotFoundError("No collection with that id was found for you.");
     return c;
   }
 
-  async add(collectionId: string, designId: string, ctx: RequestContext): Promise<{ collection_id: string; design_id: string; added: boolean; item_count: number }> {
+  async add(
+    collectionId: string,
+    designId: string,
+    ctx: RequestContext,
+  ): Promise<{ collection_id: string; design_id: string; added: boolean; item_count: number }> {
     this.owned(collectionId, ctx);
     const { design } = await this.designs.get(designId, ctx);
     if (this.deps.repo.collectionDesignIds(collectionId).length >= MAX_ITEMS_PER_COLLECTION) {
@@ -65,7 +78,10 @@ export class CollectionService {
     }));
   }
 
-  get(collectionId: string, ctx: RequestContext): { collection: CollectionView; designs: Array<{ design: Design; canHotlink: boolean }> } {
+  get(
+    collectionId: string,
+    ctx: RequestContext,
+  ): { collection: CollectionView; designs: Array<{ design: Design; canHotlink: boolean }> } {
     const c = this.owned(collectionId, ctx);
     const viewer = { principalId: ctx.principal.id, now: ctx.now };
     const hotlink = new Map(this.deps.registry.list().map((s) => [s.adapter.id, s.capabilities.canHotlink]));
@@ -74,6 +90,9 @@ export class CollectionService {
       .map((id) => this.deps.repo.getDesign(id, viewer))
       .filter((d): d is Design => d !== null && hotlink.has(d.source))
       .map((design) => ({ design, canHotlink: hotlink.get(design.source) ?? false }));
-    return { collection: { id: c.id, name: c.name, created_at: c.createdAt, item_count: ids.length }, designs };
+    return {
+      collection: { id: c.id, name: c.name, created_at: c.createdAt, item_count: ids.length },
+      designs,
+    };
   }
 }

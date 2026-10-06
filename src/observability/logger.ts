@@ -15,7 +15,10 @@ export function createLogger(opts: LoggerOptions): Logger {
     {
       level: opts.level,
       base: { app: "edison-x" },
-      redact: { paths: ["req.headers.authorization", "headers.authorization", "authorization"], censor: "[REDACTED]" },
+      redact: {
+        paths: ["req.headers.authorization", "headers.authorization", "authorization"],
+        censor: "[REDACTED]",
+      },
       hooks: {
         logMethod(args, method) {
           const safe = args.map((a) => (typeof a === "string" ? redactString(a) : redactValue(a)));

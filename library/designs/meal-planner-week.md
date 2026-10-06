@@ -1,6 +1,6 @@
 # Weekly meal planner with drag cards
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** health-fitness
 - **Platform:** web

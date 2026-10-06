@@ -40,11 +40,16 @@ export class ConnectionService {
   async status(source: string, ctx: RequestContext): Promise<ConnectionStatusView> {
     const loaded = this.deps.registry.get(source);
     if (!loaded) throw new NotFoundError("No enabled source has that id.");
-    if (!loaded.capabilities.requiresUserAuth) return { source, connected: true, notes: "This source does not need a connection." };
+    if (!loaded.capabilities.requiresUserAuth)
+      return { source, connected: true, notes: "This source does not need a connection." };
     const connected = (await loaded.adapter.connectionStatus?.(ctx))?.connected ?? false;
     if (connected) return { source, connected: true };
     if (!this.publicBaseUrl) {
-      return { source, connected: false, notes: "Connecting needs the HTTP deployment with PUBLIC_BASE_URL set; ask the owner." };
+      return {
+        source,
+        connected: false,
+        notes: "Connecting needs the HTTP deployment with PUBLIC_BASE_URL set; ask the owner.",
+      };
     }
     const ticket = this.issueTicket(ctx.principal.id, source, ctx.now.getTime());
     return { source, connected: false, connect_url: `${this.publicBaseUrl}/connect/${source}?t=${ticket}` };

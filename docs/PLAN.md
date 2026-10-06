@@ -4,31 +4,31 @@ Built to `edison-x-builder/` (Rules, Prompt.md, Guidelines.md). Where this plan 
 
 ## Versions used (recorded per Rules/03-mcp-protocol.md)
 
-| Package | Version |
-|---|---|
-| Node.js (LTS) | 22.x (`engines: >=22`) |
-| `@modelcontextprotocol/sdk` | 1.32.1 (stdio and Streamable HTTP, `McpServer.registerTool`) |
-| `zod` | 4.6.5 |
-| `better-sqlite3` | 13.0.3 (SQLite 3.53 with FTS5) |
-| `pino` | 10.4.0 |
-| `sharp` | 0.35.5 (image resize for `get_design include_image`) |
-| `@anthropic-ai/sdk` | 0.131.0 (analysis layer only) |
-| TypeScript / Vitest / ESLint / Prettier | 7.0.2 / 5.0.3 / 10.12 / 3.9 |
+| Package                                 | Version                                                      |
+| --------------------------------------- | ------------------------------------------------------------ |
+| Node.js (LTS)                           | 22.x (`engines: >=22`)                                       |
+| `@modelcontextprotocol/sdk`             | 1.32.1 (stdio and Streamable HTTP, `McpServer.registerTool`) |
+| `zod`                                   | 4.6.5                                                        |
+| `better-sqlite3`                        | 13.0.3 (SQLite 3.53 with FTS5)                               |
+| `pino`                                  | 10.4.0                                                       |
+| `sharp`                                 | 0.35.5 (image resize for `get_design include_image`)         |
+| `@anthropic-ai/sdk`                     | 0.131.0 (analysis layer only)                                |
+| TypeScript / Vitest / ESLint / Prettier | 7.0.2 / 5.0.3 / 10.12 / 3.9                                  |
 
 MCP spec and SDK docs were read from the installed package's type definitions (no network docs were reachable for the MCP site).
 
 ## Phases
 
-| # | Scope | Proof |
-|---|---|---|
-| 0 | Scaffold, strict TS, lint/format/test, `config.ts`, source register, fail-closed registry | `pnpm ci`; registry refuses a source with any blank field |
-| 1 | SQLite repository + migrations, `LibraryAdapter`, 30 seed designs, ranking, `search_inspiration`, `get_design`, stdio | MCP client contract tests; determinism test |
-| 2 | `find_similar_designs`, `get_inspiration_brief`, `list_taxonomy`, `list_sources` | Contract tests; brief cites only real ids |
-| 3 | Streamable HTTP, API keys, scopes, key CLI, rate limits, sanitizer, SSRF guard, redaction, audit, health | Security suite |
-| 4 | Pinterest adapter (official API v5, user OAuth, encrypted tokens) | Mocked-API integration tests; token-leak grep test |
-| 5 | Analysis layer (async job, schema validation, backfill with cost cap and dry run) | Validation, owner-protection, gating tests |
-| 6 | Collections, `submit_design`, `get_connection_status` | Ownership and rejection tests |
-| 7 | Load test, backup/restore, docs, container, audit, final checklist | `docs/CHECKLIST.md` with evidence |
+| #   | Scope                                                                                                                 | Proof                                                     |
+| --- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 0   | Scaffold, strict TS, lint/format/test, `config.ts`, source register, fail-closed registry                             | `pnpm ci`; registry refuses a source with any blank field |
+| 1   | SQLite repository + migrations, `LibraryAdapter`, 30 seed designs, ranking, `search_inspiration`, `get_design`, stdio | MCP client contract tests; determinism test               |
+| 2   | `find_similar_designs`, `get_inspiration_brief`, `list_taxonomy`, `list_sources`                                      | Contract tests; brief cites only real ids                 |
+| 3   | Streamable HTTP, API keys, scopes, key CLI, rate limits, sanitizer, SSRF guard, redaction, audit, health              | Security suite                                            |
+| 4   | Pinterest adapter (official API v5, user OAuth, encrypted tokens)                                                     | Mocked-API integration tests; token-leak grep test        |
+| 5   | Analysis layer (async job, schema validation, backfill with cost cap and dry run)                                     | Validation, owner-protection, gating tests                |
+| 6   | Collections, `submit_design`, `get_connection_status`                                                                 | Ownership and rejection tests                             |
+| 7   | Load test, backup/restore, docs, container, audit, final checklist                                                    | `docs/CHECKLIST.md` with evidence                         |
 
 ## Design decisions
 

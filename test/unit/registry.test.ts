@@ -42,7 +42,11 @@ describe("source registry (fails closed)", () => {
   });
 
   it("refuses an enabled id with no adapter and never loads sources that are not enabled", () => {
-    const reg = load(entryMarkdown("a") + entryMarkdown("b"), [fakeAdapter("a"), fakeAdapter("b")], ["a", "zzz"]);
+    const reg = load(
+      entryMarkdown("a") + entryMarkdown("b"),
+      [fakeAdapter("a"), fakeAdapter("b")],
+      ["a", "zzz"],
+    );
     expect(reg.ids()).toEqual(["a"]);
     expect(reg.refused.map((r) => r.id)).toEqual(["zzz"]);
   });
@@ -54,7 +58,13 @@ describe("source registry (fails closed)", () => {
     });
     const reg = load(md, [fakeAdapter("a", {}, { canProxyImage: true, cacheTtlSeconds: 3600 })], ["a"]);
     const caps = reg.get("a")?.capabilities;
-    expect(caps).toMatchObject({ canHotlink: false, canStoreMetadata: false, canAnalyze: false, canProxyImage: false, cacheTtlSeconds: 0 });
+    expect(caps).toMatchObject({
+      canHotlink: false,
+      canStoreMetadata: false,
+      canAnalyze: false,
+      canProxyImage: false,
+      cacheTtlSeconds: 0,
+    });
   });
 
   it("audits every refusal", () => {

@@ -39,13 +39,19 @@ export class PinterestConnections implements OAuthProvider {
     return `${AUTHORIZE_URL}?${qs.toString()}`;
   }
 
-  private store(principalId: string, t: TokenResponse, previous?: { refreshTokenEnc: string | null; createdAt: string }): void {
+  private store(
+    principalId: string,
+    t: TokenResponse,
+    previous?: { refreshTokenEnc: string | null; createdAt: string },
+  ): void {
     const now = this.clock();
     this.repo.upsertConnection({
       principalId,
       source: PINTEREST_SOURCE,
       accessTokenEnc: encryptString(this.key, t.access_token),
-      refreshTokenEnc: t.refresh_token ? encryptString(this.key, t.refresh_token) : (previous?.refreshTokenEnc ?? null),
+      refreshTokenEnc: t.refresh_token
+        ? encryptString(this.key, t.refresh_token)
+        : (previous?.refreshTokenEnc ?? null),
       expiresAt: t.expires_in ? new Date(now.getTime() + t.expires_in * 1000).toISOString() : null,
       scope: t.scope ?? null,
       createdAt: previous?.createdAt ?? now.toISOString(),
@@ -65,7 +71,8 @@ export class PinterestConnections implements OAuthProvider {
   getAccessToken(principalId: string, signal?: AbortSignal): Promise<string> {
     const conn = this.repo.getConnection(principalId, PINTEREST_SOURCE);
     if (!conn) throw new SourceError(PINTEREST_SOURCE, "not_connected");
-    const expiresSoon = conn.expiresAt !== null && Date.parse(conn.expiresAt) - this.clock().getTime() < REFRESH_SKEW_MS;
+    const expiresSoon =
+      conn.expiresAt !== null && Date.parse(conn.expiresAt) - this.clock().getTime() < REFRESH_SKEW_MS;
     if (!expiresSoon) return Promise.resolve(decryptString(this.key, conn.accessTokenEnc));
     return this.refresh(principalId, signal);
   }

@@ -4,7 +4,11 @@ import { entryMarkdown, NOW } from "../helpers/fixtures.js";
 
 describe("source register", () => {
   it("parses entries and ignores fenced templates", () => {
-    const md = "# Title\n```\n## fake\n- Status: APPROVED\n```\n" + entryMarkdown("alpha") + "\n" + entryMarkdown("beta");
+    const md =
+      "# Title\n```\n## fake\n- Status: APPROVED\n```\n" +
+      entryMarkdown("alpha") +
+      "\n" +
+      entryMarkdown("beta");
     const reg = parseRegister(md);
     expect([...reg.keys()]).toEqual(["alpha", "beta"]);
     expect(reg.get("alpha")?.["Status"]).toBe("APPROVED");
@@ -45,8 +49,13 @@ describe("source register", () => {
   });
 
   it("refuses an approval with no date and malformed capabilities", () => {
-    expect(validateEntry("a", parseRegister(entryMarkdown("a", { "Owner approval": "Owner" })).get("a"), NOW).ok).toBe(false);
-    expect(validateEntry("a", parseRegister(entryMarkdown("a", { Capabilities: "canSearch=true" })).get("a"), NOW).ok).toBe(false);
+    expect(
+      validateEntry("a", parseRegister(entryMarkdown("a", { "Owner approval": "Owner" })).get("a"), NOW).ok,
+    ).toBe(false);
+    expect(
+      validateEntry("a", parseRegister(entryMarkdown("a", { Capabilities: "canSearch=true" })).get("a"), NOW)
+        .ok,
+    ).toBe(false);
   });
 
   it("returns a problem when no entry exists", () => {

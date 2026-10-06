@@ -30,7 +30,10 @@ export class Metrics {
     return this.counters.get(key(name, labels)) ?? 0;
   }
 
-  snapshot(): { counters: Record<string, number>; summaries: Record<string, { count: number; sum: number }> } {
+  snapshot(): {
+    counters: Record<string, number>;
+    summaries: Record<string, { count: number; sum: number }>;
+  } {
     return { counters: Object.fromEntries(this.counters), summaries: Object.fromEntries(this.sums) };
   }
 

@@ -1,6 +1,6 @@
 # Product launch page with animated gradient
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** landing-page
 - **Platform:** web

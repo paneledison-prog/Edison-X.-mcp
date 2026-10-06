@@ -113,14 +113,16 @@ export function loadSources(opts: LoadOptions): SourceRegistry {
     const { entry } = validation;
     const problems: string[] = [];
     if (entry.status === "BLOCKED") problems.push("register status is BLOCKED");
-    if (entry.status !== adapter.status) problems.push(`register status ${entry.status} does not match adapter status ${adapter.status}`);
+    if (entry.status !== adapter.status)
+      problems.push(`register status ${entry.status} does not match adapter status ${adapter.status}`);
     if (problems.length > 0) {
       refuse(id, problems);
       continue;
     }
     const capabilities = effectiveCapabilities(adapter, entry);
     const narrowed = CAPABILITY_FLAGS.filter((f) => adapter.capabilities[f] && !capabilities[f]);
-    if (narrowed.length > 0) opts.logger.info({ source: id, narrowed }, "capabilities narrowed to the register's grants");
+    if (narrowed.length > 0)
+      opts.logger.info({ source: id, narrowed }, "capabilities narrowed to the register's grants");
     loaded.set(id, { adapter, entry, capabilities });
   }
   return new SourceRegistry(loaded, refused);

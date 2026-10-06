@@ -23,7 +23,12 @@ export const listSources: ToolDefinition<typeof inputSchema> = {
       }),
     ),
   }),
-  annotations: { title: "List design sources", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    title: "List design sources",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   async handler(_args, ctx) {
     return { data: { sources: await ctx.services.sourcesInfo.list(ctx) } };
   },

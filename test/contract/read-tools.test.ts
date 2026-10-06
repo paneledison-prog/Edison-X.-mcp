@@ -45,15 +45,23 @@ describe("tool registry contract", () => {
     for (const t of tools) {
       expect(t.description?.length ?? 0).toBeGreaterThan(60);
       const props = (t.inputSchema.properties ?? {}) as Record<string, { description?: string }>;
-      for (const [name, schema] of Object.entries(props)) expect(schema.description, `${t.name}.${name}`).toBeTruthy();
+      for (const [name, schema] of Object.entries(props))
+        expect(schema.description, `${t.name}.${name}`).toBeTruthy();
     }
   });
 
   it("sets honest annotations: write tools are not read-only, external tools are open-world", async () => {
     const { tools } = await c.client.listTools();
     const by = Object.fromEntries(tools.map((t) => [t.name, t.annotations]));
-    for (const w of ["create_collection", "add_to_collection", "submit_design"]) expect(by[w]?.readOnlyHint).toBe(false);
-    for (const r of ["search_inspiration", "get_design", "get_inspiration_brief", "list_taxonomy", "list_sources"]) {
+    for (const w of ["create_collection", "add_to_collection", "submit_design"])
+      expect(by[w]?.readOnlyHint).toBe(false);
+    for (const r of [
+      "search_inspiration",
+      "get_design",
+      "get_inspiration_brief",
+      "list_taxonomy",
+      "list_sources",
+    ]) {
       expect(by[r]?.readOnlyHint).toBe(true);
     }
     expect(by["search_inspiration"]?.openWorldHint).toBe(true);
@@ -82,7 +90,11 @@ describe("search_inspiration", () => {
   it("returns credited, linked, schema-valid results with an attribution notice", async () => {
     const r = await c.call("search_inspiration", { query: "dark fitness dashboard", platform: "web" });
     expect(r.isError).toBeFalsy();
-    const out = r.structuredContent as { results: Array<Record<string, unknown>>; attribution_notice: string; sources_queried: string[] };
+    const out = r.structuredContent as {
+      results: Array<Record<string, unknown>>;
+      attribution_notice: string;
+      sources_queried: string[];
+    };
     expect(JSON.parse(textOf(r))).toEqual(out);
     const def = ALL_TOOLS.find((t) => t.name === "search_inspiration");
     expect(def?.outputSchema.safeParse(out).success).toBe(true);
@@ -97,20 +109,30 @@ describe("search_inspiration", () => {
   });
 
   it("ranks the most relevant design first", async () => {
-    const out = await c.data<{ results: Array<{ id: string }> }>("search_inspiration", { query: "dark fitness dashboard with ring progress", platform: "web" });
+    const out = await c.data<{ results: Array<{ id: string }> }>("search_inspiration", {
+      query: "dark fitness dashboard with ring progress",
+      platform: "web",
+    });
     expect(out.results[0]?.id).toBe("library:fitness-dashboard-dark");
   });
 
   it("boosts by category, platform, style and color", async () => {
-    const out = await c.data<{ results: Array<{ id: string; category?: string; platform: string }> }>("search_inspiration", {
-      query: "app",
-      category: "sign-in",
-      platform: "ios",
-      limit: 5,
-    });
+    const out = await c.data<{ results: Array<{ id: string; category?: string; platform: string }> }>(
+      "search_inspiration",
+      {
+        query: "app",
+        category: "sign-in",
+        platform: "ios",
+        limit: 5,
+      },
+    );
     expect(out.results.length).toBeGreaterThan(0);
     expect(out.results[0]?.category).toBe("sign-in");
-    const red = await c.data<{ results: Array<{ palette?: string[] }> }>("search_inspiration", { query: "landing page", color_hint: "pink", limit: 20 });
+    const red = await c.data<{ results: Array<{ palette?: string[] }> }>("search_inspiration", {
+      query: "landing page",
+      color_hint: "pink",
+      limit: 20,
+    });
     expect(red.results.length).toBeGreaterThan(1);
   });
 
@@ -128,15 +150,30 @@ describe("search_inspiration", () => {
   });
 
   it("paginates with opaque signed cursors and rejects tampered or foreign ones", async () => {
-    const p1 = await c.data<{ results: Array<{ id: string }>; next_cursor?: string }>("search_inspiration", { query: "card layout", limit: 2 });
+    const p1 = await c.data<{ results: Array<{ id: string }>; next_cursor?: string }>("search_inspiration", {
+      query: "card layout",
+      limit: 2,
+    });
     expect(p1.next_cursor).toBeTruthy();
-    const p2 = await c.data<{ results: Array<{ id: string }>; next_cursor?: string }>("search_inspiration", { query: "card layout", limit: 2, cursor: p1.next_cursor });
+    const p2 = await c.data<{ results: Array<{ id: string }>; next_cursor?: string }>("search_inspiration", {
+      query: "card layout",
+      limit: 2,
+      cursor: p1.next_cursor,
+    });
     expect(p2.results.map((r) => r.id)).not.toEqual(p1.results.map((r) => r.id));
     const ids = new Set([...p1.results, ...p2.results].map((r) => r.id));
     expect(ids.size).toBe(p1.results.length + p2.results.length);
-    const tampered = await c.call("search_inspiration", { query: "card layout", limit: 2, cursor: `${p1.next_cursor}x` });
+    const tampered = await c.call("search_inspiration", {
+      query: "card layout",
+      limit: 2,
+      cursor: `${p1.next_cursor}x`,
+    });
     expect(tampered.isError).toBe(true);
-    const wrongQuery = await c.call("search_inspiration", { query: "landing page", limit: 2, cursor: p1.next_cursor });
+    const wrongQuery = await c.call("search_inspiration", {
+      query: "landing page",
+      limit: 2,
+      cursor: p1.next_cursor,
+    });
     expect(wrongQuery.isError).toBe(true);
     expect(textOf(wrongQuery)).toMatch(/cursor/i);
   });
@@ -159,7 +196,10 @@ describe("search_inspiration", () => {
   });
 
   it("reports unknown sources as skipped instead of failing", async () => {
-    const out = await c.data<{ sources_skipped: Array<{ source: string; reason: string }>; results: unknown[] }>("search_inspiration", {
+    const out = await c.data<{
+      sources_skipped: Array<{ source: string; reason: string }>;
+      results: unknown[];
+    }>("search_inspiration", {
       query: "dashboard",
       sources: ["library", "nope"],
     });
@@ -170,7 +210,14 @@ describe("search_inspiration", () => {
 
 describe("get_design", () => {
   it("returns the full design with owner analysis, credit and a notice", async () => {
-    const out = await c.data<{ id: string; source_url: string; attribution: string; license: string; analysis: { generatedBy: string; components: string[] }; attribution_notice: string }>("get_design", { id: "library:fitness-dashboard-dark" });
+    const out = await c.data<{
+      id: string;
+      source_url: string;
+      attribution: string;
+      license: string;
+      analysis: { generatedBy: string; components: string[] };
+      attribution_notice: string;
+    }>("get_design", { id: "library:fitness-dashboard-dark" });
     expect(out.id).toBe("library:fitness-dashboard-dark");
     expect(out.source_url).toMatch(/^https:\/\//);
     expect(out.attribution).toBeTruthy();
@@ -193,7 +240,10 @@ describe("get_design", () => {
   });
 
   it("ignores include_image when nothing can be proxied and says so in notes", async () => {
-    const out = await c.data<{ notes?: string }>("get_design", { id: "library:fitness-dashboard-dark", include_image: true });
+    const out = await c.data<{ notes?: string }>("get_design", {
+      id: "library:fitness-dashboard-dark",
+      include_image: true,
+    });
     expect(out.notes).toMatch(/no image/i);
   });
 });

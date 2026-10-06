@@ -54,7 +54,13 @@ export function principalWith(scopes: Scope[], id = "p_test"): Principal {
   return { id, name: id, scopes, createdAt: NOW.toISOString() };
 }
 
-export const ALL_SCOPES: Scope[] = ["read:search", "read:design", "write:collections", "write:library", "admin"];
+export const ALL_SCOPES: Scope[] = [
+  "read:search",
+  "read:design",
+  "write:collections",
+  "write:library",
+  "admin",
+];
 
 export interface TestClient {
   client: Client;
@@ -63,7 +69,10 @@ export interface TestClient {
   close(): Promise<void>;
 }
 
-export async function connect(app: App, principal: Principal = principalWith(ALL_SCOPES)): Promise<TestClient> {
+export async function connect(
+  app: App,
+  principal: Principal = principalWith(ALL_SCOPES),
+): Promise<TestClient> {
   const server = buildServer(principal, app.runDeps);
   const [a, b] = InMemoryTransport.createLinkedPair();
   await server.connect(a);

@@ -1,6 +1,6 @@
 # Designer portfolio with case study grid
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** portfolio
 - **Platform:** web

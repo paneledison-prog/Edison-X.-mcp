@@ -30,7 +30,9 @@ export function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): num
   db.exec(
     "CREATE TABLE IF NOT EXISTS schema_migrations (id INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)",
   );
-  const done = new Set((db.prepare("SELECT id FROM schema_migrations").all() as Array<{ id: number }>).map((r) => r.id));
+  const done = new Set(
+    (db.prepare("SELECT id FROM schema_migrations").all() as Array<{ id: number }>).map((r) => r.id),
+  );
   const applied: number[] = [];
   for (const m of [...migrations].sort((a, b) => a.id - b.id)) {
     if (done.has(m.id)) continue;
@@ -95,7 +97,10 @@ export class SqliteRepository implements Repository {
     };
     const parsed = DesignSchema.safeParse(candidate);
     if (!parsed.success) {
-      this.logger?.warn({ id: row.id, issues: parsed.error.issues.length }, "dropping design row that fails validation");
+      this.logger?.warn(
+        { id: row.id, issues: parsed.error.issues.length },
+        "dropping design row that fails validation",
+      );
       return null;
     }
     return parsed.data;
@@ -104,16 +109,18 @@ export class SqliteRepository implements Repository {
   upsertDesign(d: Design, opts: DesignWriteOptions = {}): void {
     const tx = this.db.transaction(() => {
       const ownerKey = opts.ownerPrincipalId ?? "";
-      const existing = this.db.prepare("SELECT rid, analysis, analysis_by FROM designs WHERE id = ? AND owner_key = ?").get(d.id, ownerKey) as
-        | { rid: number; analysis: string | null; analysis_by: string | null }
-        | undefined;
+      const existing = this.db
+        .prepare("SELECT rid, analysis, analysis_by FROM designs WHERE id = ? AND owner_key = ?")
+        .get(d.id, ownerKey) as
+        { rid: number; analysis: string | null; analysis_by: string | null } | undefined;
 
       // Owner analysis is never overwritten by model analysis; absent analysis never wipes existing analysis.
       let analysis = d.analysis;
       if (existing?.analysis) {
         const existingBy = existing.analysis_by;
         if (!analysis) analysis = JSON.parse(existing.analysis) as DesignAnalysis;
-        else if (existingBy === "owner" && analysis.generatedBy === "model") analysis = JSON.parse(existing.analysis) as DesignAnalysis;
+        else if (existingBy === "owner" && analysis.generatedBy === "model")
+          analysis = JSON.parse(existing.analysis) as DesignAnalysis;
       }
 
       const params = {
@@ -157,10 +164,16 @@ export class SqliteRepository implements Repository {
              expires_at=excluded.expires_at`,
         )
         .run(params);
-      const rid = (this.db.prepare("SELECT rid FROM designs WHERE id = ? AND owner_key = ?").get(d.id, ownerKey) as { rid: number }).rid;
+      const rid = (
+        this.db.prepare("SELECT rid FROM designs WHERE id = ? AND owner_key = ?").get(d.id, ownerKey) as {
+          rid: number;
+        }
+      ).rid;
       this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(rid);
       this.db
-        .prepare("INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)")
+        .prepare(
+          "INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)",
+        )
         .run(rid, d.title, d.tags.join(" "), d.summary ?? "", analysisText(analysis), d.category ?? "");
     });
     tx();
@@ -168,7 +181,9 @@ export class SqliteRepository implements Repository {
 
   private visibleClause(sourcesLen: number): string {
     return `(d.expires_at IS NULL OR d.expires_at > @now) AND (d.owner_principal_id IS NULL OR d.owner_principal_id = @viewer)${
-      sourcesLen > 0 ? ` AND d.source IN (${Array.from({ length: sourcesLen }, (_, i) => `@s${i}`).join(",")})` : ""
+      sourcesLen > 0
+        ? ` AND d.source IN (${Array.from({ length: sourcesLen }, (_, i) => `@s${i}`).join(",")})`
+        : ""
     }`;
   }
 
@@ -257,7 +272,9 @@ export class SqliteRepository implements Repository {
   /** Writes to every row with this id (one per owner for per-user sources). Returns true if any row changed. */
   private writeAnalysis(id: string, analysis: DesignAnalysis, allowOverwriteOwner: boolean): boolean {
     const tx = this.db.transaction(() => {
-      const rows = this.db.prepare("SELECT rid, title, tags, summary, category, analysis_by FROM designs WHERE id = ?").all(id) as Array<{
+      const rows = this.db
+        .prepare("SELECT rid, title, tags, summary, category, analysis_by FROM designs WHERE id = ?")
+        .all(id) as Array<{
         rid: number;
         title: string;
         tags: string;
@@ -269,12 +286,23 @@ export class SqliteRepository implements Repository {
       for (const row of rows) {
         if (!allowOverwriteOwner && row.analysis_by === "owner") continue;
         this.db
-          .prepare("UPDATE designs SET analysis = ?, analysis_by = ?, analysis_failed_at = NULL WHERE rid = ?")
+          .prepare(
+            "UPDATE designs SET analysis = ?, analysis_by = ?, analysis_failed_at = NULL WHERE rid = ?",
+          )
           .run(j(analysis), analysis.generatedBy, row.rid);
         this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(row.rid);
         this.db
-          .prepare("INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)")
-          .run(row.rid, row.title, (JSON.parse(row.tags) as string[]).join(" "), row.summary ?? "", analysisText(analysis), row.category ?? "");
+          .prepare(
+            "INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)",
+          )
+          .run(
+            row.rid,
+            row.title,
+            (JSON.parse(row.tags) as string[]).join(" "),
+            row.summary ?? "",
+            analysisText(analysis),
+            row.category ?? "",
+          );
         changed = true;
       }
       return changed;
@@ -324,7 +352,10 @@ export class SqliteRepository implements Repository {
 
   purgeSource(source: string): number {
     return this.db.transaction(() => {
-      const rids = this.db.prepare("SELECT rid, id FROM designs WHERE source = ?").all(source) as Array<{ rid: number; id: string }>;
+      const rids = this.db.prepare("SELECT rid, id FROM designs WHERE source = ?").all(source) as Array<{
+        rid: number;
+        id: string;
+      }>;
       for (const r of rids) {
         this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(r.rid);
         this.db.prepare("DELETE FROM collection_items WHERE design_id = ?").run(r.id);
@@ -360,7 +391,9 @@ export class SqliteRepository implements Repository {
         this.db.prepare("DELETE FROM designs WHERE rid = ?").run(r.rid);
         this.db.prepare("DELETE FROM collection_items WHERE design_id = ?").run(r.id);
       }
-      this.db.prepare("DELETE FROM source_cache WHERE principal_id = ? AND source = ?").run(principalId, source);
+      this.db
+        .prepare("DELETE FROM source_cache WHERE principal_id = ? AND source = ?")
+        .run(principalId, source);
       return rows.length;
     })();
   }
@@ -373,7 +406,13 @@ export class SqliteRepository implements Repository {
     return { designIds: JSON.parse(row.design_ids) as string[], totalEstimate: row.total_estimate };
   }
 
-  putSourceCache(key: string, source: string, principalId: string, entry: SourceCacheEntry, expiresAt: Date): void {
+  putSourceCache(
+    key: string,
+    source: string,
+    principalId: string,
+    entry: SourceCacheEntry,
+    expiresAt: Date,
+  ): void {
     this.db
       .prepare(
         `INSERT INTO source_cache (cache_key, source, principal_id, design_ids, total_estimate, expires_at)
@@ -425,31 +464,44 @@ export class SqliteRepository implements Repository {
           `INSERT INTO api_keys (id, principal_id, key_hash, key_prefix, rate_per_min, rate_per_day, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
         )
-        .run(key.keyId, principal.id, key.keyHash, key.keyPrefix, key.ratePerMin ?? null, key.ratePerDay ?? null, principal.createdAt);
+        .run(
+          key.keyId,
+          principal.id,
+          key.keyHash,
+          key.keyPrefix,
+          key.ratePerMin ?? null,
+          key.ratePerDay ?? null,
+          principal.createdAt,
+        );
     })();
   }
 
   findKeysByPrefix(prefix: string): KeyRecord[] {
-    return (this.db.prepare(`${SqliteRepository.KEY_SELECT} WHERE k.key_prefix = ?`).all(prefix) as Row[]).map((r) => this.rowToKey(r));
+    return (
+      this.db.prepare(`${SqliteRepository.KEY_SELECT} WHERE k.key_prefix = ?`).all(prefix) as Row[]
+    ).map((r) => this.rowToKey(r));
   }
 
   revokeKey(keyId: string, at: Date): boolean {
     return this.db.transaction(() => {
       const row = this.db.prepare("SELECT principal_id, revoked_at FROM api_keys WHERE id = ?").get(keyId) as
-        | { principal_id: string; revoked_at: string | null }
-        | undefined;
+        { principal_id: string; revoked_at: string | null } | undefined;
       if (!row) return false;
       const iso = at.toISOString();
-      this.db.prepare("UPDATE api_keys SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ?").run(iso, keyId);
-      this.db.prepare("UPDATE principals SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ?").run(iso, row.principal_id);
+      this.db
+        .prepare("UPDATE api_keys SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ?")
+        .run(iso, keyId);
+      this.db
+        .prepare("UPDATE principals SET revoked_at = COALESCE(revoked_at, ?) WHERE id = ?")
+        .run(iso, row.principal_id);
       return true;
     })();
   }
 
   listKeys(): KeyRecord[] {
-    return (this.db.prepare(`${SqliteRepository.KEY_SELECT} ORDER BY k.created_at ASC, k.id ASC`).all() as Row[]).map((r) =>
-      this.rowToKey(r),
-    );
+    return (
+      this.db.prepare(`${SqliteRepository.KEY_SELECT} ORDER BY k.created_at ASC, k.id ASC`).all() as Row[]
+    ).map((r) => this.rowToKey(r));
   }
 
   touchKey(keyId: string, at: Date): void {
@@ -458,7 +510,9 @@ export class SqliteRepository implements Repository {
 
   getPrincipal(id: string): Principal | null {
     const row = this.db
-      .prepare("SELECT id AS p_id, name AS p_name, scopes AS p_scopes, created_at AS p_created_at, revoked_at AS p_revoked_at FROM principals WHERE id = ?")
+      .prepare(
+        "SELECT id AS p_id, name AS p_name, scopes AS p_scopes, created_at AS p_created_at, revoked_at AS p_revoked_at FROM principals WHERE id = ?",
+      )
       .get(id) as Row | undefined;
     return row ? this.rowToPrincipal(row) : null;
   }
@@ -510,7 +564,11 @@ export class SqliteRepository implements Repository {
   }
 
   deleteConnection(principalId: string, source: string): boolean {
-    return this.db.prepare("DELETE FROM oauth_connections WHERE principal_id = ? AND source = ?").run(principalId, source).changes > 0;
+    return (
+      this.db
+        .prepare("DELETE FROM oauth_connections WHERE principal_id = ? AND source = ?")
+        .run(principalId, source).changes > 0
+    );
   }
 
   saveOAuthState(stateHash: string, principalId: string, source: string, expiresAt: Date): void {
@@ -522,9 +580,9 @@ export class SqliteRepository implements Repository {
 
   consumeOAuthState(stateHash: string, now: Date): { principalId: string; source: string } | null {
     return this.db.transaction(() => {
-      const row = this.db.prepare("SELECT principal_id, source, expires_at FROM oauth_states WHERE state_hash = ?").get(stateHash) as
-        | { principal_id: string; source: string; expires_at: string }
-        | undefined;
+      const row = this.db
+        .prepare("SELECT principal_id, source, expires_at FROM oauth_states WHERE state_hash = ?")
+        .get(stateHash) as { principal_id: string; source: string; expires_at: string } | undefined;
       if (!row) return null;
       this.db.prepare("DELETE FROM oauth_states WHERE state_hash = ?").run(stateHash);
       if (row.expires_at <= now.toISOString()) return null;
@@ -543,7 +601,12 @@ export class SqliteRepository implements Repository {
   getCollection(id: string): Collection | null {
     const r = this.db.prepare("SELECT * FROM collections WHERE id = ?").get(id) as Row | undefined;
     return r
-      ? { id: r.id as string, ownerPrincipalId: r.owner_principal_id as string, name: r.name as string, createdAt: r.created_at as string }
+      ? {
+          id: r.id as string,
+          ownerPrincipalId: r.owner_principal_id as string,
+          name: r.name as string,
+          createdAt: r.created_at as string,
+        }
       : null;
   }
 
@@ -566,14 +629,20 @@ export class SqliteRepository implements Repository {
   addCollectionItem(collectionId: string, designId: string, at: Date): boolean {
     return (
       this.db
-        .prepare("INSERT OR IGNORE INTO collection_items (collection_id, design_id, added_at) VALUES (?, ?, ?)")
+        .prepare(
+          "INSERT OR IGNORE INTO collection_items (collection_id, design_id, added_at) VALUES (?, ?, ?)",
+        )
         .run(collectionId, designId, at.toISOString()).changes > 0
     );
   }
 
   collectionDesignIds(collectionId: string): string[] {
     return (
-      this.db.prepare("SELECT design_id FROM collection_items WHERE collection_id = ? ORDER BY added_at ASC, design_id ASC").all(collectionId) as Array<{
+      this.db
+        .prepare(
+          "SELECT design_id FROM collection_items WHERE collection_id = ? ORDER BY added_at ASC, design_id ASC",
+        )
+        .all(collectionId) as Array<{
         design_id: string;
       }>
     ).map((r) => r.design_id);
@@ -590,7 +659,9 @@ export class SqliteRepository implements Repository {
   listAudit(opts: { event?: string; limit: number }): AuditEntry[] {
     const rows = (
       opts.event
-        ? this.db.prepare("SELECT * FROM audit_log WHERE event = ? ORDER BY id DESC LIMIT ?").all(opts.event, opts.limit)
+        ? this.db
+            .prepare("SELECT * FROM audit_log WHERE event = ? ORDER BY id DESC LIMIT ?")
+            .all(opts.event, opts.limit)
         : this.db.prepare("SELECT * FROM audit_log ORDER BY id DESC LIMIT ?").all(opts.limit)
     ) as Row[];
     return rows.map((r) => ({
@@ -613,10 +684,20 @@ export class SqliteRepository implements Repository {
       .run(day, usage.costUsd, usage.inputTokens, usage.outputTokens);
   }
 
-  getAnalysisUsage(day: string): { costUsd: number; inputTokens: number; outputTokens: number; calls: number } {
+  getAnalysisUsage(day: string): {
+    costUsd: number;
+    inputTokens: number;
+    outputTokens: number;
+    calls: number;
+  } {
     const r = this.db.prepare("SELECT * FROM analysis_usage WHERE day = ?").get(day) as Row | undefined;
     return r
-      ? { costUsd: r.cost_usd as number, inputTokens: r.input_tokens as number, outputTokens: r.output_tokens as number, calls: r.calls as number }
+      ? {
+          costUsd: r.cost_usd as number,
+          inputTokens: r.input_tokens as number,
+          outputTokens: r.output_tokens as number,
+          calls: r.calls as number,
+        }
       : { costUsd: 0, inputTokens: 0, outputTokens: 0, calls: 0 };
   }
 

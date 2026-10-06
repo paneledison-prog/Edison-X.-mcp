@@ -4,11 +4,17 @@ import { ATTRIBUTION_NOTICE } from "./shared.js";
 import type { ToolDefinition } from "./types.js";
 
 const inputSchema = {
-  id: z.string().min(3).max(170).describe("Design id from a search result, e.g. 'library:fitness-dashboard-dark'."),
+  id: z
+    .string()
+    .min(3)
+    .max(170)
+    .describe("Design id from a search result, e.g. 'library:fitness-dashboard-dark'."),
   include_image: z
     .boolean()
     .default(false)
-    .describe("If true and the source allows it, also return the image itself (max 1280px, 1 MB). Otherwise ignored; see 'notes'."),
+    .describe(
+      "If true and the source allows it, also return the image itself (max 1280px, 1 MB). Otherwise ignored; see 'notes'.",
+    ),
 };
 
 const outputSchema = z.object({
@@ -44,7 +50,12 @@ export const getDesign: ToolDefinition<typeof inputSchema> = {
   scope: "read:design",
   inputSchema,
   outputSchema,
-  annotations: { title: "Get one design with analysis", readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+  annotations: {
+    title: "Get one design with analysis",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: true,
+  },
   async handler(args, ctx) {
     const lookup = await ctx.services.designs.get(args.id, ctx);
     const d = lookup.design;
@@ -53,7 +64,8 @@ export const getDesign: ToolDefinition<typeof inputSchema> = {
     let extraContent: Array<{ type: "image"; data: string; mimeType: string }> | undefined;
     if (args.include_image) {
       const img = await ctx.services.designs.image(lookup, ctx);
-      if ("image" in img) extraContent = [{ type: "image", data: img.image.data, mimeType: img.image.mimeType }];
+      if ("image" in img)
+        extraContent = [{ type: "image", data: img.image.data, mimeType: img.image.mimeType }];
       else notes = img.note;
     }
     return {

@@ -19,7 +19,10 @@ const EVIL: RawDesign[] = [
   {
     sourceId: "evil2",
     sourceUrl: "https://example.com/pins/evil2",
-    title: "Dark dashboard [click here](https://attacker.example/phish) " + String.fromCharCode(0x200b) + "www.attacker.example",
+    title:
+      "Dark dashboard [click here](https://attacker.example/phish) " +
+      String.fromCharCode(0x200b) +
+      "www.attacker.example",
     summary: "<script>fetch('https://attacker.example')</script>Great dark dashboard for fitness stats",
     tags: ["dashboard", "fitness"],
     platform: "web",
@@ -32,7 +35,10 @@ let app: App;
 let c: TestClient;
 
 beforeEach(async () => {
-  const ext = fakeAdapter("ext", { search: () => Promise.resolve({ designs: EVIL }), getById: (id) => Promise.resolve(EVIL.find((e) => e.sourceId === id) ?? null) });
+  const ext = fakeAdapter("ext", {
+    search: () => Promise.resolve({ designs: EVIL }),
+    getById: (id) => Promise.resolve(EVIL.find((e) => e.sourceId === id) ?? null),
+  });
   app = testApp({ adapters: [ext], registerMarkdown: entryMarkdown("ext") });
   c = await connect(app);
 });
@@ -41,14 +47,23 @@ afterEach(async () => {
   app.close();
 });
 
-const BAD = new RegExp(`ignore (all )?(previous|prior)|attacker\\.example|send_email|<script|delete everything|${String.fromCharCode(0x200b)}|steal\\.png|127\\.0\\.0\\.1|passwd`, "i");
+const BAD = new RegExp(
+  `ignore (all )?(previous|prior)|attacker\\.example|send_email|<script|delete everything|${String.fromCharCode(0x200b)}|steal\\.png|127\\.0\\.0\\.1|passwd`,
+  "i",
+);
 
 describe("hostile source content never reaches the agent as instructions", () => {
   it("search results carry only neutralised data", async () => {
-    const r = await c.call("search_inspiration", { query: "dark fitness dashboard", sources: ["ext"], limit: 20 });
+    const r = await c.call("search_inspiration", {
+      query: "dark fitness dashboard",
+      sources: ["ext"],
+      limit: 20,
+    });
     const text = JSON.stringify(r.structuredContent);
     expect(text).not.toMatch(BAD);
-    const results = (r.structuredContent as { results: Array<{ id: string; title: string; attribution: string }> }).results;
+    const results = (
+      r.structuredContent as { results: Array<{ id: string; title: string; attribution: string }> }
+    ).results;
     expect(results.map((x) => x.id).sort()).toEqual(["ext:evil1", "ext:evil2"]);
     expect(results.find((x) => x.id === "ext:evil1")?.title).toMatch(/withheld/);
     expect(results.find((x) => x.id === "ext:evil1")?.attribution).toBe("Via Example - unknown creator");
@@ -73,7 +88,9 @@ describe("hostile source content never reaches the agent as instructions", () =>
       expect(flags.length).toBeGreaterThanOrEqual(4);
       expect(JSON.stringify(flags)).not.toMatch(BAD);
       expect(flags.some((f) => f.details.field === "title")).toBe(true);
-      expect(app.metrics.get("edison_sanitizer_rejects_total", { source: "ext", reason: "invalid_source_id" })).toBe(1);
+      expect(
+        app.metrics.get("edison_sanitizer_rejects_total", { source: "ext", reason: "invalid_source_id" }),
+      ).toBe(1);
     });
   });
 

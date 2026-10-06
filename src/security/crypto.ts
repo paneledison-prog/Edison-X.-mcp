@@ -1,4 +1,12 @@
-import { createCipheriv, createDecipheriv, createHash, createHmac, hkdfSync, randomBytes, timingSafeEqual } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  createHmac,
+  hkdfSync,
+  randomBytes,
+  timingSafeEqual,
+} from "node:crypto";
 
 /** Derive an independent 32-byte key per purpose from the master key (HKDF-SHA256). */
 export function deriveKey(masterKeyBase64: string, purpose: string): Buffer {
@@ -46,8 +54,15 @@ export function hmacBase64Url(key: Buffer, data: string): string {
 }
 
 /** Sign a JSON payload with an expiry. Format: base64url(json).base64url(hmac). */
-export function signPayload(key: Buffer, payload: Record<string, unknown>, ttlSeconds: number, now = Date.now()): string {
-  const body = Buffer.from(JSON.stringify({ ...payload, exp: Math.floor(now / 1000) + ttlSeconds })).toString("base64url");
+export function signPayload(
+  key: Buffer,
+  payload: Record<string, unknown>,
+  ttlSeconds: number,
+  now = Date.now(),
+): string {
+  const body = Buffer.from(JSON.stringify({ ...payload, exp: Math.floor(now / 1000) + ttlSeconds })).toString(
+    "base64url",
+  );
   return `${body}.${hmacBase64Url(key, body)}`;
 }
 

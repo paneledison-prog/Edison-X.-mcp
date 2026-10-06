@@ -21,10 +21,19 @@ export class FtsTextScorer implements TextScorer {
       db.exec(
         "CREATE VIRTUAL TABLE t USING fts5(id UNINDEXED, title, tags, summary, analysis_text, category, tokenize = 'porter unicode61')",
       );
-      const insert = db.prepare("INSERT INTO t (id, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)");
+      const insert = db.prepare(
+        "INSERT INTO t (id, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)",
+      );
       // Sorted insertion keeps corpus statistics identical across runs.
       for (const d of [...designs].sort((a, b) => a.id.localeCompare(b.id))) {
-        insert.run(d.id, d.title, d.tags.join(" "), d.summary ?? "", analysisText(d.analysis), d.category ?? "");
+        insert.run(
+          d.id,
+          d.title,
+          d.tags.join(" "),
+          d.summary ?? "",
+          analysisText(d.analysis),
+          d.category ?? "",
+        );
       }
       const rows = db
         .prepare("SELECT id, bm25(t, 0.0, 10.0, 6.0, 3.0, 2.0, 4.0) AS rank FROM t WHERE t MATCH ?")

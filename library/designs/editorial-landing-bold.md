@@ -1,6 +1,6 @@
 # Editorial landing page with oversized type
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** landing-page
 - **Platform:** web

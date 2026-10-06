@@ -27,10 +27,11 @@ Template (the parser ignores fenced blocks):
 ```
 
 ## library
+
 - Status: OWN_LIBRARY
 - Access method: Owned data. Designs live in Edison X's own database. The starter set is `library/seed-designs.json` in this repository (original structural descriptions written for this project, with no third-party images, copy or branding). More designs are added through the `submit_design` tool or `pnpm library:import`.
 - Terms URL: https://github.com/paneledison-prog/Edison-X.-mcp
-- Terms reviewed on: 2026-10-06   by: Claude (builder), Edison X build session
+- Terms reviewed on: 2026-10-06 by: Claude (builder), Edison X build session
 - Terms summary: No third-party terms apply to owned data. Every library item carries its own `license` and `attribution`. `submit_design` rejects items with no license or an origin on the blocked list. The owner may remove any item at any time (`pnpm design:remove`, see docs/RUNBOOK.md). Third-party images are never copied into the library; only the owner's own image URLs on hosts listed in `LIBRARY_IMAGE_HOSTS` may be returned or proxied.
 - AI/ML usage rule: none found (owned data; no third-party rule applies). Analysis may run on library items.
 - Capabilities: canSearch=true, canGetById=true, canStoreMetadata=true, canAnalyze=true, canHotlink=true, canProxyImage=true, cacheTtlSeconds=0
@@ -40,6 +41,7 @@ Template (the parser ignores fenced blocks):
 - Notes / risks: The 32 starter items are generic UI patterns, not copies of any real product. Replace or extend them with real, credited designs the owner has the right to include.
 
 ## pinterest
+
 - Status: USER_OAUTH
 - Access method: Pinterest REST API v5 (https://api.pinterest.com/v5) with OAuth 2.0 authorization-code flow, scopes `boards:read` and `pins:read`. Reads only the connecting user's own boards and pins. No scraping and no internal endpoints.
 - Terms URL: https://developers.pinterest.com/terms/

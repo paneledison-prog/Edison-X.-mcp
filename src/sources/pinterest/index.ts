@@ -1,7 +1,15 @@
 import { SourceError } from "../../errors.js";
 import type { PinterestConnections } from "../../auth/oauth-pinterest.js";
 import { PinterestClient, PINTEREST_API_HOST, PINTEREST_IMAGE_HOST, type Pin } from "./client.js";
-import type { ConnectionStatus, RawDesign, RequestContext, SourceAdapter, SourceCapabilities, SourcePage, SourceQuery } from "../types.js";
+import type {
+  ConnectionStatus,
+  RawDesign,
+  RequestContext,
+  SourceAdapter,
+  SourceCapabilities,
+  SourcePage,
+  SourceQuery,
+} from "../types.js";
 
 export const PINTEREST_ID = "pinterest";
 const MAX_PAGES = 4;
@@ -24,7 +32,9 @@ export function pinToRaw(pin: Pin): RawDesign {
     sourceUrl: `https://www.pinterest.com/pin/${encodeURIComponent(pin.id)}/`,
     imageUrl: big?.url,
     thumbnailUrl: small?.url,
-    creator: username ? { name: username, url: `https://www.pinterest.com/${encodeURIComponent(username)}/` } : null,
+    creator: username
+      ? { name: username, url: `https://www.pinterest.com/${encodeURIComponent(username)}/` }
+      : null,
     license: "source-terms",
     summary: pin.description ?? pin.alt_text ?? undefined,
     tags: ["pinterest"],
@@ -109,6 +119,8 @@ export class PinterestAdapter implements SourceAdapter {
   }
 
   healthCheck(): Promise<{ ok: boolean; detail?: string }> {
-    return Promise.resolve(this.client.cooldownSeconds() > 0 ? { ok: false, detail: "rate limited" } : { ok: true });
+    return Promise.resolve(
+      this.client.cooldownSeconds() > 0 ? { ok: false, detail: "rate limited" } : { ok: true },
+    );
   }
 }

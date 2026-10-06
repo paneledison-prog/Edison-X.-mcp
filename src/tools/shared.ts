@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { ATTRIBUTION_NOTICE, PublicDesignSummarySchema, toPublicSummary, type Design } from "../sources/types.js";
+import {
+  ATTRIBUTION_NOTICE,
+  PublicDesignSummarySchema,
+  toPublicSummary,
+  type Design,
+} from "../sources/types.js";
 
 export const PlatformInput = z
   .enum(["web", "ios", "android", "desktop", "any"])
@@ -16,7 +21,9 @@ export const ResultListOutput = {
   truncated: z.boolean().optional(),
 };
 
-export function publicResults(items: Array<{ design: Design; canHotlink: boolean }>): ReturnType<typeof toPublicSummary>[] {
+export function publicResults(
+  items: Array<{ design: Design; canHotlink: boolean }>,
+): ReturnType<typeof toPublicSummary>[] {
   return items.map((i) => toPublicSummary(i.design, i.canHotlink));
 }
 

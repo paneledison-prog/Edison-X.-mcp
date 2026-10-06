@@ -27,7 +27,11 @@ export function entryMarkdown(id: string, overrides: Record<string, string | nul
   return `## ${id}\n${lines.join("\n")}\n`;
 }
 
-export function fakeAdapter(id: string, patch: Partial<SourceAdapter> = {}, caps: Partial<SourceCapabilities> = {}): SourceAdapter {
+export function fakeAdapter(
+  id: string,
+  patch: Partial<SourceAdapter> = {},
+  caps: Partial<SourceCapabilities> = {},
+): SourceAdapter {
   return {
     id,
     displayName: id,

@@ -38,3 +38,11 @@ export function fail(message: string): never {
   console.error(message);
   process.exit(1);
 }
+
+/** Thrown inside a command so `finally` blocks (closing the database) still run; the caller prints it and sets the exit code. */
+export class CliError extends Error {}
+
+export function reportAndSetExit(err: unknown): void {
+  console.error(err instanceof Error ? err.message : "Command failed.");
+  process.exitCode = 1;
+}

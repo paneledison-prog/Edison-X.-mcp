@@ -30,16 +30,28 @@ function readBody(req: IncomingMessage, limit = MAX_BODY_BYTES): Promise<Buffer>
   });
 }
 
-function sendJson(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}): void {
+function sendJson(
+  res: ServerResponse,
+  status: number,
+  body: unknown,
+  headers: Record<string, string> = {},
+): void {
   if (res.headersSent) return;
   const text = JSON.stringify(body);
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(text), ...headers });
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": Buffer.byteLength(text),
+    ...headers,
+  });
   res.end(text);
 }
 
 function sendHtml(res: ServerResponse, status: number, message: string): void {
   const html = `<!doctype html><meta charset="utf-8"><title>Edison X</title><body style="font-family:system-ui;max-width:32rem;margin:4rem auto;padding:0 1rem"><h1>Edison X</h1><p>${message}</p></body>`;
-  res.writeHead(status, { "Content-Type": "text/html; charset=utf-8", "Content-Length": Buffer.byteLength(html) });
+  res.writeHead(status, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": Buffer.byteLength(html),
+  });
   res.end(html);
 }
 
@@ -61,20 +73,24 @@ export function createHttpServer(app: App): Server {
 
   const hostnameOf = (host: string | undefined): string => {
     if (!host) return "";
-    const h = host.startsWith("[") ? host.slice(1, host.indexOf("]")) : host.split(":")[0] ?? "";
+    const h = host.startsWith("[") ? host.slice(1, host.indexOf("]")) : (host.split(":")[0] ?? "");
     return h.toLowerCase();
   };
 
   /** Validates the bearer key, applies the per-key rate limit, and returns the principal. Throws on failure. */
   const authenticate = (req: IncomingMessage) => {
     const ip = clientIp(req);
-    if (authFailures.blocked(ip).blocked) throw new RateLimitError(authFailures.blocked(ip).retryAfterSeconds, "too many failed attempts");
+    if (authFailures.blocked(ip).blocked)
+      throw new RateLimitError(authFailures.blocked(ip).retryAfterSeconds, "too many failed attempts");
     try {
       const auth = app.resolvePrincipal(req.headers.authorization);
       enforceKeyRateLimit(
         app.repo,
         auth.principal.id,
-        { perMin: auth.limits.perMin ?? config.rateLimitPerMin, perDay: auth.limits.perDay ?? config.rateLimitPerDay },
+        {
+          perMin: auth.limits.perMin ?? config.rateLimitPerMin,
+          perDay: auth.limits.perDay ?? config.rateLimitPerDay,
+        },
         app.runDeps.clock(),
       );
       return auth;
@@ -92,15 +108,28 @@ export function createHttpServer(app: App): Server {
 
   const handleError = (res: ServerResponse, err: unknown): void => {
     if (err instanceof AuthError) {
-      sendJson(res, 401, { error: "unauthorized", message: "Send a valid key as 'Authorization: Bearer <key>'." }, { "WWW-Authenticate": 'Bearer realm="edison-x"' });
+      sendJson(
+        res,
+        401,
+        { error: "unauthorized", message: "Send a valid key as 'Authorization: Bearer <key>'." },
+        { "WWW-Authenticate": 'Bearer realm="edison-x"' },
+      );
     } else if (err instanceof RateLimitError) {
-      sendJson(res, 429, { error: "rate_limited", message: `Rate limit reached. Retry in ${err.retryAfterSeconds} seconds.` }, { "Retry-After": String(err.retryAfterSeconds) });
+      sendJson(
+        res,
+        429,
+        { error: "rate_limited", message: `Rate limit reached. Retry in ${err.retryAfterSeconds} seconds.` },
+        { "Retry-After": String(err.retryAfterSeconds) },
+      );
     } else if (err instanceof NotFoundError) {
       sendJson(res, 404, { error: "not_found", message: "Not found." });
     } else if (err instanceof ValidationError) {
       sendJson(res, 400, { error: "bad_request", message: err.message });
     } else if (err instanceof PayloadTooLarge) {
-      sendJson(res, 413, { error: "payload_too_large", message: `Request bodies are limited to ${MAX_BODY_BYTES} bytes.` });
+      sendJson(res, 413, {
+        error: "payload_too_large",
+        message: `Request bodies are limited to ${MAX_BODY_BYTES} bytes.`,
+      });
     } else {
       logger.error({ err }, "http handler failed");
       sendJson(res, 500, { error: "internal", message: "The server hit an unexpected problem." });
@@ -111,9 +140,11 @@ export function createHttpServer(app: App): Server {
     const url = new URL(req.url ?? "/", "http://localhost");
     const method = req.method ?? "GET";
 
-    if (!allowedHostnames.has(hostnameOf(req.headers.host))) return sendJson(res, 403, { error: "forbidden_host", message: "Unknown host." });
+    if (!allowedHostnames.has(hostnameOf(req.headers.host)))
+      return sendJson(res, 403, { error: "forbidden_host", message: "Unknown host." });
     const origin = req.headers.origin;
-    if (origin && !config.allowedOrigins.includes(origin)) return sendJson(res, 403, { error: "forbidden_origin", message: "Origin not allowed." });
+    if (origin && !config.allowedOrigins.includes(origin))
+      return sendJson(res, 403, { error: "forbidden_origin", message: "Origin not allowed." });
 
     if (url.pathname === "/healthz" && method === "GET") return sendJson(res, 200, { status: "ok" });
 
@@ -129,7 +160,11 @@ export function createHttpServer(app: App): Server {
       }
       const dbOk = app.repo.ping();
       const ready = dbOk && Object.values(checks).every((v) => v === "ok");
-      return sendJson(res, ready ? 200 : 503, { status: ready ? "ready" : "not_ready", database: dbOk ? "ok" : "down", sources: checks });
+      return sendJson(res, ready ? 200 : 503, {
+        status: ready ? "ready" : "not_ready",
+        database: dbOk ? "ok" : "down",
+        sources: checks,
+      });
     }
 
     if (url.pathname === "/metrics" && method === "GET") {
@@ -139,23 +174,34 @@ export function createHttpServer(app: App): Server {
         return sendJson(res, 403, { error: "forbidden", message: "The admin scope is required." });
       }
       const text = metrics.render();
-      res.writeHead(200, { "Content-Type": "text/plain; version=0.0.4", "Content-Length": Buffer.byteLength(text) });
+      res.writeHead(200, {
+        "Content-Type": "text/plain; version=0.0.4",
+        "Content-Length": Buffer.byteLength(text),
+      });
       return void res.end(text);
     }
 
     if (url.pathname === "/mcp") {
-      if (method !== "POST") return sendJson(res, 405, { error: "method_not_allowed", message: "Use POST." }, { Allow: "POST" });
+      if (method !== "POST")
+        return sendJson(res, 405, { error: "method_not_allowed", message: "Use POST." }, { Allow: "POST" });
       const { principal } = authenticate(req);
       const raw = await readBody(req);
       let parsed: unknown;
       try {
         parsed = JSON.parse(raw.toString("utf8"));
       } catch {
-        return sendJson(res, 400, { jsonrpc: "2.0", error: { code: -32700, message: "Parse error" }, id: null });
+        return sendJson(res, 400, {
+          jsonrpc: "2.0",
+          error: { code: -32700, message: "Parse error" },
+          id: null,
+        });
       }
       // Stateless: one server and transport per request, bound to this principal.
       const server = buildServer(principal, app.runDeps);
-      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+        enableJsonResponse: true,
+      });
       res.on("close", () => {
         void transport.close();
         void server.close();
@@ -173,7 +219,8 @@ export function createHttpServer(app: App): Server {
         // Anonymous by necessity (a browser redirect). The single-use `state` binds it to the principal who started the flow.
         const state = url.searchParams.get("state") ?? "";
         const code = url.searchParams.get("code") ?? "";
-        if (url.searchParams.get("error") || !state || !code) return sendHtml(res, 400, "The connection was cancelled or incomplete. You can close this tab.");
+        if (url.searchParams.get("error") || !state || !code)
+          return sendHtml(res, 400, "The connection was cancelled or incomplete. You can close this tab.");
         try {
           await app.oauth.complete(source, state, code);
           return sendHtml(res, 200, "Connected. You can close this tab and return to your agent.");
@@ -188,10 +235,18 @@ export function createHttpServer(app: App): Server {
         const ticket = url.searchParams.get("t");
         const verified = ticket ? app.connections.verifyTicket(ticket, app.runDeps.clock().getTime()) : null;
         if (!verified || verified.source !== source) {
-          if (authFailures.record(clientIp(req)) <= 5) audit.record("auth_denied", null, { route: "connect" });
-          return sendHtml(res, 401, "This connect link is invalid or has expired. Ask your agent for a new one.");
+          if (authFailures.record(clientIp(req)) <= 5)
+            audit.record("auth_denied", null, { route: "connect" });
+          return sendHtml(
+            res,
+            401,
+            "This connect link is invalid or has expired. Ask your agent for a new one.",
+          );
         }
-        res.writeHead(302, { Location: app.oauth.begin(source, verified.principalId), "Cache-Control": "no-store" });
+        res.writeHead(302, {
+          Location: app.oauth.begin(source, verified.principalId),
+          "Cache-Control": "no-store",
+        });
         return void res.end();
       }
 

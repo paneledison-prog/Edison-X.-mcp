@@ -1,5 +1,13 @@
 import type { DesignRepository } from "../../storage/repository.js";
-import type { Design, RawDesign, RequestContext, SourceAdapter, SourceCapabilities, SourcePage, SourceQuery } from "../types.js";
+import type {
+  Design,
+  RawDesign,
+  RequestContext,
+  SourceAdapter,
+  SourceCapabilities,
+  SourcePage,
+  SourceQuery,
+} from "../types.js";
 
 export const LIBRARY_ID = "library";
 
@@ -43,7 +51,9 @@ export class LibraryAdapter implements SourceAdapter {
 
   /** @param imageHosts hosts the owner's own images live on; empty means no image fetching. */
   constructor(
-    private readonly repo: Pick<DesignRepository, "searchByTerms" | "getDesign" | "countDesigns"> & { ping(): boolean },
+    private readonly repo: Pick<DesignRepository, "searchByTerms" | "getDesign" | "countDesigns"> & {
+      ping(): boolean;
+    },
     readonly allowedHosts: readonly string[] = [],
   ) {}
 
@@ -58,7 +68,10 @@ export class LibraryAdapter implements SourceAdapter {
   }
 
   getById(sourceId: string, ctx: RequestContext): Promise<RawDesign | null> {
-    const d = this.repo.getDesign(`${LIBRARY_ID}:${sourceId}`, { principalId: ctx.principal.id, now: ctx.now });
+    const d = this.repo.getDesign(`${LIBRARY_ID}:${sourceId}`, {
+      principalId: ctx.principal.id,
+      now: ctx.now,
+    });
     return Promise.resolve(d ? designToRaw(d) : null);
   }
 

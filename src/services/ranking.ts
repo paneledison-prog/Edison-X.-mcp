@@ -78,7 +78,10 @@ export function colorCloseness(a: [number, number, number], b: [number, number, 
   return Math.max(0, 1 - dist / 200);
 }
 
-export function paletteCloseness(palette: string[] | undefined, hint: [number, number, number] | null): number {
+export function paletteCloseness(
+  palette: string[] | undefined,
+  hint: [number, number, number] | null,
+): number {
   if (!palette || palette.length === 0 || !hint) return 0;
   return Math.max(...palette.map((c) => colorCloseness(hint, parseColor(c) ?? [0, 0, 0])));
 }
@@ -113,7 +116,8 @@ export function canonicalUrl(url: string): string {
   try {
     const u = new URL(url);
     u.hash = "";
-    for (const k of [...u.searchParams.keys()]) if (/^(utm_|ref$|fbclid$|gclid$)/i.test(k)) u.searchParams.delete(k);
+    for (const k of [...u.searchParams.keys()])
+      if (/^(utm_|ref$|fbclid$|gclid$)/i.test(k)) u.searchParams.delete(k);
     u.hostname = u.hostname.toLowerCase();
     return u.toString().replace(/\/+$/, "");
   } catch {

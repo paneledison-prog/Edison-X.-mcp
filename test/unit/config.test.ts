@@ -16,7 +16,9 @@ describe("config", () => {
 
   it("exits with a clear message when the key is missing, without echoing values", () => {
     expect(() => loadConfig({})).toThrow(ConfigError);
-    expect(() => loadConfig({ TOKEN_ENCRYPTION_KEY: "not-a-key-secret-value" })).toThrow(/TOKEN_ENCRYPTION_KEY/);
+    expect(() => loadConfig({ TOKEN_ENCRYPTION_KEY: "not-a-key-secret-value" })).toThrow(
+      /TOKEN_ENCRYPTION_KEY/,
+    );
     try {
       loadConfig({ TOKEN_ENCRYPTION_KEY: "not-a-key-secret-value" });
     } catch (e) {
@@ -25,7 +27,9 @@ describe("config", () => {
   });
 
   it("requires Pinterest settings when pinterest is enabled", () => {
-    expect(() => loadConfig({ ...base, ENABLED_SOURCES: "library,pinterest" })).toThrow(/PINTEREST_CLIENT_ID/);
+    expect(() => loadConfig({ ...base, ENABLED_SOURCES: "library,pinterest" })).toThrow(
+      /PINTEREST_CLIENT_ID/,
+    );
     const c = loadConfig({
       ...base,
       ENABLED_SOURCES: "library,pinterest",
@@ -40,7 +44,12 @@ describe("config", () => {
 
   it("requires a cost cap and API key when analysis is enabled", () => {
     expect(() => loadConfig({ ...base, ANALYSIS_ENABLED: "true" })).toThrow(/ANALYSIS_DAILY_COST_CAP/);
-    const c = loadConfig({ ...base, ANALYSIS_ENABLED: "true", ANALYSIS_DAILY_COST_CAP: "2.5", ANTHROPIC_API_KEY: "k" });
+    const c = loadConfig({
+      ...base,
+      ANALYSIS_ENABLED: "true",
+      ANALYSIS_DAILY_COST_CAP: "2.5",
+      ANTHROPIC_API_KEY: "k",
+    });
     expect(c.analysis.dailyCostCapUsd).toBe(2.5);
   });
 
@@ -50,6 +59,8 @@ describe("config", () => {
   });
 
   it("insists on https in production", () => {
-    expect(() => loadConfig({ ...base, NODE_ENV: "production", PUBLIC_BASE_URL: "http://x.example.com" })).toThrow(/https/);
+    expect(() =>
+      loadConfig({ ...base, NODE_ENV: "production", PUBLIC_BASE_URL: "http://x.example.com" }),
+    ).toThrow(/https/);
   });
 });

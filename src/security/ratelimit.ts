@@ -37,7 +37,12 @@ export interface KeyLimits {
  * Per-key limits (default 60/min, 1000/day) kept in the database so they survive restarts and are
  * shared across processes. A denied minute check does not consume daily budget.
  */
-export function enforceKeyRateLimit(repo: AuthRepository, principalId: string, limits: KeyLimits, now: Date): void {
+export function enforceKeyRateLimit(
+  repo: AuthRepository,
+  principalId: string,
+  limits: KeyLimits,
+  now: Date,
+): void {
   const minBucket = Math.floor(now.getTime() / 60_000);
   const dayBucket = Math.floor(now.getTime() / 86_400_000);
   if (repo.incrementWindow(principalId, "min", minBucket) > limits.perMin) {
@@ -67,7 +72,8 @@ export class FailureLimiter {
     if (!e || e.resetAt <= now) {
       const fresh = { count: 0, resetAt: now + this.windowMs };
       this.entries.set(key, fresh);
-      if (this.entries.size > 10_000) for (const [k, v] of this.entries) if (v.resetAt <= now) this.entries.delete(k);
+      if (this.entries.size > 10_000)
+        for (const [k, v] of this.entries) if (v.resetAt <= now) this.entries.delete(k);
       return fresh;
     }
     return e;
@@ -75,7 +81,10 @@ export class FailureLimiter {
 
   blocked(key: string): { blocked: boolean; retryAfterSeconds: number } {
     const e = this.current(key);
-    return { blocked: e.count >= this.max, retryAfterSeconds: Math.max(1, Math.ceil((e.resetAt - this.nowMs()) / 1000)) };
+    return {
+      blocked: e.count >= this.max,
+      retryAfterSeconds: Math.max(1, Math.ceil((e.resetAt - this.nowMs()) / 1000)),
+    };
   }
 
   /** Returns the new failure count for this window. */

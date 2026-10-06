@@ -19,5 +19,10 @@ export function createApiKeyResolver(keys: KeyService): ResolvePrincipal {
 
 /** The configured local principal used by the stdio transport (the owner's own machine). */
 export function localPrincipal(config: Pick<Config, "stdioPrincipalName" | "stdioScopes">): Principal {
-  return { id: "local", name: config.stdioPrincipalName, scopes: [...config.stdioScopes], createdAt: new Date(0).toISOString() };
+  return {
+    id: "local",
+    name: config.stdioPrincipalName,
+    scopes: [...config.stdioScopes],
+    createdAt: new Date(0).toISOString(),
+  };
 }

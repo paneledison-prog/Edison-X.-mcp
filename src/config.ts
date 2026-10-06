@@ -21,7 +21,9 @@ const EnvSchema = z.object({
   BIND_HOST: z.string().min(1).default("127.0.0.1"),
   TRANSPORT: z.enum(["stdio", "http"]).default("stdio"),
   DATABASE_PATH: z.string().min(1).default("./data/edison-x.db"),
-  TOKEN_ENCRYPTION_KEY: z.string().refine(isValidMasterKey, "must be 32 bytes, base64-encoded (run: pnpm gen:key)"),
+  TOKEN_ENCRYPTION_KEY: z
+    .string()
+    .refine(isValidMasterKey, "must be 32 bytes, base64-encoded (run: pnpm gen:key)"),
   PUBLIC_BASE_URL: optionalString.pipe(z.url().optional()),
   ALLOWED_ORIGINS: z.string().default("").transform(csv),
   TRUST_PROXY: flag.default(false),
@@ -38,6 +40,7 @@ const EnvSchema = z.object({
   ANALYSIS_DAILY_COST_CAP: optionalString
     .transform((v) => (v === undefined ? undefined : Number(v)))
     .pipe(z.number().positive().optional()),
+  ANALYSIS_INTERVAL_MINUTES: z.coerce.number().int().min(1).max(1440).default(10),
   ANALYSIS_MODEL: z.string().min(1).default("claude-opus-5-5"),
   ANALYSIS_PRICE_IN_PER_MTOK: z.coerce.number().nonnegative().default(4),
   ANALYSIS_PRICE_OUT_PER_MTOK: z.coerce.number().nonnegative().default(20),
@@ -48,6 +51,9 @@ const EnvSchema = z.object({
   TOOL_TIMEOUT_MS: z.coerce.number().int().min(100).default(15_000),
   SOURCE_TIMEOUT_MS: z.coerce.number().int().min(100).default(5_000),
 });
+
+/** Every environment variable the server reads. `.env.example` must list exactly these (tested). */
+export const ENV_VARIABLES: string[] = Object.keys(EnvSchema.shape);
 
 export interface Config {
   nodeEnv: "development" | "test" | "production";
@@ -74,6 +80,7 @@ export interface Config {
     priceOutPerMTok: number;
     anthropicApiKey?: string;
   };
+  analysisIntervalMinutes: number;
   logLevel: string;
   rateLimitPerMin: number;
   rateLimitPerDay: number;
@@ -95,14 +102,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   try {
     stdioScopes = parseScopes(e.STDIO_SCOPES);
   } catch {
-    problems.push("STDIO_SCOPES: must be a preset (search-only, curator, owner) or a comma list of valid scopes");
+    problems.push(
+      "STDIO_SCOPES: must be a preset (search-only, curator, owner) or a comma list of valid scopes",
+    );
   }
 
   let pinterest: Config["pinterest"];
   if (e.ENABLED_SOURCES.includes("pinterest")) {
     if (!e.PINTEREST_CLIENT_ID) problems.push("PINTEREST_CLIENT_ID: required when pinterest is enabled");
-    if (!e.PINTEREST_CLIENT_SECRET) problems.push("PINTEREST_CLIENT_SECRET: required when pinterest is enabled");
-    if (!e.PINTEREST_REDIRECT_URI) problems.push("PINTEREST_REDIRECT_URI: required when pinterest is enabled");
+    if (!e.PINTEREST_CLIENT_SECRET)
+      problems.push("PINTEREST_CLIENT_SECRET: required when pinterest is enabled");
+    if (!e.PINTEREST_REDIRECT_URI)
+      problems.push("PINTEREST_REDIRECT_URI: required when pinterest is enabled");
     if (!e.PUBLIC_BASE_URL) problems.push("PUBLIC_BASE_URL: required when pinterest is enabled");
     if (e.PINTEREST_CLIENT_ID && e.PINTEREST_CLIENT_SECRET && e.PINTEREST_REDIRECT_URI) {
       pinterest = {
@@ -114,13 +125,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   }
 
   if (e.ANALYSIS_ENABLED) {
-    if (e.ANALYSIS_DAILY_COST_CAP === undefined) problems.push("ANALYSIS_DAILY_COST_CAP: required when ANALYSIS_ENABLED=true");
+    if (e.ANALYSIS_DAILY_COST_CAP === undefined)
+      problems.push("ANALYSIS_DAILY_COST_CAP: required when ANALYSIS_ENABLED=true");
     if (!e.ANTHROPIC_API_KEY) problems.push("ANTHROPIC_API_KEY: required when ANALYSIS_ENABLED=true");
   }
   if (e.NODE_ENV === "production" && e.PUBLIC_BASE_URL && !e.PUBLIC_BASE_URL.startsWith("https://")) {
     problems.push("PUBLIC_BASE_URL: must be https in production");
   }
-  if (problems.length > 0) throw new ConfigError(`Invalid configuration:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
+  if (problems.length > 0)
+    throw new ConfigError(`Invalid configuration:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
 
   return {
     nodeEnv: e.NODE_ENV,
@@ -147,6 +160,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       priceOutPerMTok: e.ANALYSIS_PRICE_OUT_PER_MTOK,
       anthropicApiKey: e.ANTHROPIC_API_KEY,
     },
+    analysisIntervalMinutes: e.ANALYSIS_INTERVAL_MINUTES,
     logLevel: e.LOG_LEVEL,
     rateLimitPerMin: e.RATE_LIMIT_PER_MIN,
     rateLimitPerDay: e.RATE_LIMIT_PER_DAY,

@@ -30,9 +30,23 @@ export const DesignSchema = z.object({
   sourceId: z.string().regex(/^[A-Za-z0-9_.-]{1,128}$/),
   title: z.string().min(1).max(200),
   sourceUrl: z.url({ protocol: /^https$/ }).max(2000),
-  imageUrl: z.url({ protocol: /^https$/ }).max(2000).optional(),
-  thumbnailUrl: z.url({ protocol: /^https$/ }).max(2000).optional(),
-  creator: z.object({ name: z.string().min(1).max(100), url: z.url({ protocol: /^https$/ }).max(2000).optional() }).optional(),
+  imageUrl: z
+    .url({ protocol: /^https$/ })
+    .max(2000)
+    .optional(),
+  thumbnailUrl: z
+    .url({ protocol: /^https$/ })
+    .max(2000)
+    .optional(),
+  creator: z
+    .object({
+      name: z.string().min(1).max(100),
+      url: z
+        .url({ protocol: /^https$/ })
+        .max(2000)
+        .optional(),
+    })
+    .optional(),
   license: z.string().min(1).max(60).optional(),
   attribution: z.string().min(1).max(300),
   platform: PlatformSchema,
@@ -142,7 +156,9 @@ export interface SourceAdapter {
 }
 
 export function renderAttribution(template: string, creator?: string): string {
-  return template.replace("{creator}", creator && creator.length > 0 ? creator : "unknown creator").slice(0, 300);
+  return template
+    .replace("{creator}", creator && creator.length > 0 ? creator : "unknown creator")
+    .slice(0, 300);
 }
 
 /** The shape returned to agents in result lists. */

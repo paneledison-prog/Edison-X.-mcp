@@ -47,10 +47,14 @@ export class LibraryService {
   submit(input: SubmitInput, ctx: RequestContext): { id: string; created: boolean } {
     const lib = this.library();
     if (!lib) throw new ValidationError("The library source is not enabled on this server.");
-    if (!input.license.trim()) throw new ValidationError("A license is required for every library submission.");
-    if (!input.attribution.trim()) throw new ValidationError("An attribution is required for every library submission.");
+    if (!input.license.trim())
+      throw new ValidationError("A license is required for every library submission.");
+    if (!input.attribution.trim())
+      throw new ValidationError("An attribution is required for every library submission.");
 
-    const urls = [input.sourceUrl, input.imageUrl, input.thumbnailUrl, input.creatorUrl].filter((u): u is string => !!u);
+    const urls = [input.sourceUrl, input.imageUrl, input.thumbnailUrl, input.creatorUrl].filter(
+      (u): u is string => !!u,
+    );
     for (const u of urls) {
       let host: string;
       try {
@@ -87,15 +91,36 @@ export class LibraryService {
     };
     const result = importLibraryDesigns([raw], {
       repo: this.deps.repo,
-      adapter: { id: lib.adapter.id, attributionTemplate: lib.adapter.attributionTemplate, capabilities: lib.capabilities, ownerContent: true },
+      adapter: {
+        id: lib.adapter.id,
+        attributionTemplate: lib.adapter.attributionTemplate,
+        capabilities: lib.capabilities,
+        ownerContent: true,
+      },
       now: ctx.now,
       submittedBy: ctx.principal.id,
-      onFlag: (e) => this.deps.audit.record("sanitizer_flag", ctx.principal.id, { source: "library", field: e.field, rule: e.rule }),
+      onFlag: (e) =>
+        this.deps.audit.record("sanitizer_flag", ctx.principal.id, {
+          source: "library",
+          field: e.field,
+          rule: e.rule,
+        }),
     });
     if (result.imported !== 1) {
-      throw new ValidationError(`The design was rejected (${result.rejected[0]?.reason ?? "invalid"}). Check the title, source_url and license.`);
+      const reason = result.rejected[0]?.reason ?? "invalid";
+      if (reason === "safety_filter")
+        throw new ValidationError(
+          "The submission contains instruction-like text and was rejected by the safety filter.",
+        );
+      throw new ValidationError(
+        `The design was rejected (${reason}). Check the title, source_url and license.`,
+      );
     }
-    this.deps.audit.record("library_submission", ctx.principal.id, { id, origin: input.origin, license: input.license });
+    this.deps.audit.record("library_submission", ctx.principal.id, {
+      id,
+      origin: input.origin,
+      license: input.license,
+    });
     return { id, created: !existed };
   }
 }

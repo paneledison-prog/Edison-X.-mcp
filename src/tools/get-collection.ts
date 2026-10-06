@@ -15,7 +15,12 @@ export const getCollection: ToolDefinition<typeof inputSchema> = {
   scope: "read:search",
   inputSchema,
   outputSchema: z.object({
-    collection: z.object({ id: z.string(), name: z.string(), created_at: z.string(), item_count: z.number() }),
+    collection: z.object({
+      id: z.string(),
+      name: z.string(),
+      created_at: z.string(),
+      item_count: z.number(),
+    }),
     designs: z.array(PublicDesignSummarySchema),
     attribution_notice: z.string(),
     truncated: z.boolean().optional(),
@@ -23,6 +28,12 @@ export const getCollection: ToolDefinition<typeof inputSchema> = {
   annotations: { title: "Get a collection", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler(args, ctx) {
     const out = ctx.services.collections.get(args.collection_id, ctx);
-    return Promise.resolve({ data: { collection: out.collection, designs: publicResults(out.designs), attribution_notice: ATTRIBUTION_NOTICE } });
+    return Promise.resolve({
+      data: {
+        collection: out.collection,
+        designs: publicResults(out.designs),
+        attribution_notice: ATTRIBUTION_NOTICE,
+      },
+    });
   },
 };

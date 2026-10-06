@@ -1,6 +1,6 @@
 # Mobile workout tracker with large set logger
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** health-fitness
 - **Platform:** ios

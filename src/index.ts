@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { startAnalysisJob } from "./analysis/job.js";
 import { createApp } from "./app.js";
 import { loadConfig } from "./config.js";
 import { ConfigError } from "./errors.js";
@@ -22,6 +23,7 @@ async function main(): Promise<void> {
     throw err;
   }
   const app = createApp(config);
+  startAnalysisJob(app);
   if (config.transport === "stdio") {
     await runStdio(app);
     process.stdin.on("close", () => {

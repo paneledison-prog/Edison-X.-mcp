@@ -1,6 +1,6 @@
 # Long-form blog article with table of contents
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** blog
 - **Platform:** web

@@ -23,14 +23,28 @@ export async function fetchAndResizeImage(
   signal: AbortSignal,
   fetcher: Fetcher = safeFetch,
 ): Promise<ImageResult> {
-  if (allowedHosts.length === 0) return { note: "Image not returned: no image hosts are configured for this source." };
+  if (allowedHosts.length === 0)
+    return { note: "Image not returned: no image hosts are configured for this source." };
   try {
-    const res = await fetcher(url, { allowedHosts, maxBytes: MAX_INPUT_BYTES, timeoutMs: 5_000, signal, headers: { Accept: "image/*" } });
+    const res = await fetcher(url, {
+      allowedHosts,
+      maxBytes: MAX_INPUT_BYTES,
+      timeoutMs: 5_000,
+      signal,
+      headers: { Accept: "image/*" },
+    });
     if (res.status !== 200) return { note: "Image not returned: the image host did not serve the file." };
-    const type = String(Array.isArray(res.headers["content-type"]) ? res.headers["content-type"][0] : res.headers["content-type"] ?? "");
-    if (!/^image\/(png|jpe?g|webp|gif|avif)/i.test(type)) return { note: "Image not returned: the file is not a supported image type." };
+    const type = String(
+      Array.isArray(res.headers["content-type"])
+        ? res.headers["content-type"][0]
+        : (res.headers["content-type"] ?? ""),
+    );
+    if (!/^image\/(png|jpe?g|webp|gif|avif)/i.test(type))
+      return { note: "Image not returned: the file is not a supported image type." };
 
-    const base = sharp(res.body, { failOn: "error", limitInputPixels: 50_000_000 }).rotate().flatten({ background: "#ffffff" });
+    const base = sharp(res.body, { failOn: "error", limitInputPixels: 50_000_000 })
+      .rotate()
+      .flatten({ background: "#ffffff" });
     for (const edge of [MAX_IMAGE_EDGE, 960, 720, 480]) {
       for (const quality of [82, 68, 54, 40]) {
         const { data, info } = await base
@@ -39,13 +53,21 @@ export async function fetchAndResizeImage(
           .jpeg({ quality, mozjpeg: true })
           .toBuffer({ resolveWithObject: true });
         if (data.length <= MAX_IMAGE_BYTES) {
-          return { image: { data: data.toString("base64"), mimeType: "image/jpeg", width: info.width, height: info.height } };
+          return {
+            image: {
+              data: data.toString("base64"),
+              mimeType: "image/jpeg",
+              width: info.width,
+              height: info.height,
+            },
+          };
         }
       }
     }
     return { note: "Image not returned: it could not be reduced below 1 MB." };
   } catch (err) {
-    if (err instanceof SsrfError) return { note: "Image not returned: the image URL was blocked by the outbound request policy." };
+    if (err instanceof SsrfError)
+      return { note: "Image not returned: the image URL was blocked by the outbound request policy." };
     return { note: "Image not returned: it could not be fetched or processed." };
   }
 }

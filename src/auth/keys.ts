@@ -36,7 +36,12 @@ export class KeyService {
   ) {}
 
   /** New keys get read:search and read:design only unless scopes are given. */
-  create(opts: { name: string; scopes?: readonly Scope[]; ratePerMin?: number; ratePerDay?: number }): IssuedKey {
+  create(opts: {
+    name: string;
+    scopes?: readonly Scope[];
+    ratePerMin?: number;
+    ratePerDay?: number;
+  }): IssuedKey {
     const name = opts.name.trim();
     if (!name || name.length > 80) throw new Error("name must be 1-80 characters");
     const { key, prefix, hash } = generateKey();
@@ -48,7 +53,13 @@ export class KeyService {
       createdAt: now,
     };
     const keyId = `k_${randomBytes(6).toString("hex")}`;
-    this.repo.createPrincipalWithKey(principal, { keyId, keyHash: hash, keyPrefix: prefix, ratePerMin: opts.ratePerMin, ratePerDay: opts.ratePerDay });
+    this.repo.createPrincipalWithKey(principal, {
+      keyId,
+      keyHash: hash,
+      keyPrefix: prefix,
+      ratePerMin: opts.ratePerMin,
+      ratePerDay: opts.ratePerDay,
+    });
     this.audit?.record("key_created", principal.id, { keyId, name, scopes: principal.scopes });
     return { key, keyId, keyPrefix: prefix, principal };
   }
@@ -74,7 +85,8 @@ export class KeyService {
     for (const c of candidates) if (constantTimeEqualHex(hash, c.keyHash)) match = c;
     if (!match || match.revokedAt || match.principal.revokedAt) throw new AuthError();
     const now = this.clock();
-    if (!match.lastUsedAt || now.getTime() - Date.parse(match.lastUsedAt) > 60_000) this.repo.touchKey(match.keyId, now);
+    if (!match.lastUsedAt || now.getTime() - Date.parse(match.lastUsedAt) > 60_000)
+      this.repo.touchKey(match.keyId, now);
     return {
       principal: match.principal,
       keyId: match.keyId,

@@ -1,6 +1,6 @@
 # Online course lesson with outline sidebar
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** education
 - **Platform:** web

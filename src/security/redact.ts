@@ -25,7 +25,11 @@ export function redactValue(value: unknown, depth = 0): unknown {
   if (typeof value === "string") return redactString(value);
   if (value === null || typeof value !== "object") return value;
   if (value instanceof Error) {
-    return { name: value.name, message: redactString(value.message), stack: value.stack ? redactString(value.stack) : undefined };
+    return {
+      name: value.name,
+      message: redactString(value.message),
+      stack: value.stack ? redactString(value.stack) : undefined,
+    };
   }
   if (Array.isArray(value)) return value.map((v) => redactValue(v, depth + 1));
   const out: Record<string, unknown> = {};

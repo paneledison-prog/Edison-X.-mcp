@@ -3,7 +3,14 @@ import type { DesignAnalysis } from "../sources/types.js";
 /** Text indexed for search from a design's analysis. */
 export function analysisText(a: DesignAnalysis | undefined): string {
   if (!a) return "";
-  return [a.layout, a.components.join(" "), a.typography, a.colorUsage, a.interactionNotes, a.buildHints.join(" ")]
+  return [
+    a.layout,
+    a.components.join(" "),
+    a.typography,
+    a.colorUsage,
+    a.interactionNotes,
+    a.buildHints.join(" "),
+  ]
     .filter(Boolean)
     .join(" ");
 }

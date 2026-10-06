@@ -10,7 +10,11 @@ export async function startHttp(app: App): Promise<RunningHttp & { url: string }
 
 export async function mcpClient(url: string, key: string): Promise<Client> {
   const client = new Client({ name: "http-test", version: "1" });
-  await client.connect(new StreamableHTTPClientTransport(new URL(`${url}/mcp`), { requestInit: { headers: { Authorization: `Bearer ${key}` } } }));
+  await client.connect(
+    new StreamableHTTPClientTransport(new URL(`${url}/mcp`), {
+      requestInit: { headers: { Authorization: `Bearer ${key}` } },
+    }),
+  );
   return client;
 }
 
@@ -18,4 +22,7 @@ export function rpc(method: string, params: unknown = {}, id = 1): string {
   return JSON.stringify({ jsonrpc: "2.0", id, method, params });
 }
 
-export const MCP_HEADERS = { "Content-Type": "application/json", Accept: "application/json, text/event-stream" };
+export const MCP_HEADERS = {
+  "Content-Type": "application/json",
+  Accept: "application/json, text/event-stream",
+};

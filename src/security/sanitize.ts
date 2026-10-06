@@ -28,17 +28,32 @@ const MD_NOISE = /[`*~]{1,}|^#{1,6}\s+|^>\s+/gm;
 
 /** Rules that mark text as an attempt to instruct the reading model. Order is for reporting only. */
 const INSTRUCTION_RULES: Array<[string, RegExp]> = [
-  ["ignore_previous", /\b(ignore|disregard|forget|override)\b[^.]{0,30}\b(previous|prior|above|earlier|all|any|system)\b[^.]{0,30}\b(instructions?|prompts?|rules?|messages?|context)\b/i],
-  ["system_prompt", /\b(system prompt|developer message|hidden (prompt|instructions?)|initial (prompt|instructions?))\b/i],
+  [
+    "ignore_previous",
+    /\b(ignore|disregard|forget|override)\b[^.]{0,30}\b(previous|prior|above|earlier|all|any|system)\b[^.]{0,30}\b(instructions?|prompts?|rules?|messages?|context)\b/i,
+  ],
+  [
+    "system_prompt",
+    /\b(system prompt|developer message|hidden (prompt|instructions?)|initial (prompt|instructions?))\b/i,
+  ],
   // Only at the start of a line or sentence, so "Design System: Atlas" is not flagged.
   ["role_marker", /(^|\n|[.!?]\s+)\s*(assistant|system|user|human|developer)\s*:/i],
   ["you_must", /\byou\s+(must|shall|are\s+now|are\s+required|will\s+now)\b/i],
   ["new_instructions", /\b(new|updated|additional)\s+instructions?\b/i],
   ["tool_json", /\{\s*"?(name|tool|tool_name|function|function_call|tool_calls?|arguments|action)"?\s*:/i],
   ["tool_call_text", /\b(call|invoke|execute)\s+(the\s+)?[a-z_]{3,40}\s+(tool|function)\b/i],
-  ["exfiltrate", /\b(send|forward|post|upload|leak|exfiltrate|email|transmit)\b[^.]{0,60}\b(tokens?|api keys?|passwords?|secrets?|credentials?|conversation|chat history|user'?s? (files|data))\b/i],
-  ["secrecy", /\b(do\s+not|don'?t|never)\s+(tell|inform|mention|reveal|disclose)\b[^.]{0,30}\b(user|human|anyone)\b/i],
-  ["reveal_prompt", /\b(reveal|print|repeat|output)\b[^.]{0,30}\b(your|the)\b[^.]{0,20}\b(prompt|instructions)\b/i],
+  [
+    "exfiltrate",
+    /\b(send|forward|upload|leak|exfiltrate|transmit)\b[^.]{0,60}\b(tokens?|api keys?|passwords?|secrets?|credentials?|conversation|chat history|user'?s? (files|data))\b|\bemail\s+(me|us|the|all|your|my)\b[^.]{0,40}\b(tokens?|keys?|passwords?|secrets?|credentials?|files)\b/i,
+  ],
+  [
+    "secrecy",
+    /\b(do\s+not|don'?t|never)\s+(tell|inform|mention|reveal|disclose)\b[^.]{0,30}\b(user|human|anyone)\b/i,
+  ],
+  [
+    "reveal_prompt",
+    /\b(reveal|print|repeat|output)\b[^.]{0,30}\b(your|the)\b[^.]{0,20}\b(prompt|instructions)\b/i,
+  ],
   ["jailbreak", /\b(jailbreak|DAN mode|developer mode)\b/i],
   ["special_tokens", /<\|[^|]*\|>|\[INST\]|<<SYS>>|<\/?(system|assistant|tool_use|function_calls)>/i],
 ];
@@ -168,7 +183,11 @@ export function sanitizeAnalysis(raw: unknown, onFlag?: FlagHandler): DesignAnal
 export function sanitizeDesign(raw: RawDesign, ctx: SanitizeContext): SanitizeResult {
   const { adapter, now, categories, onFlag } = ctx;
   const sourceId =
-    typeof raw.sourceId === "string" ? raw.sourceId : typeof raw.sourceId === "number" ? String(raw.sourceId) : "";
+    typeof raw.sourceId === "string"
+      ? raw.sourceId
+      : typeof raw.sourceId === "number"
+        ? String(raw.sourceId)
+        : "";
   if (!/^[A-Za-z0-9_.-]{1,128}$/.test(sourceId)) return { ok: false, reason: "invalid_source_id" };
 
   const sourceUrl = sanitizeUrl(raw.sourceUrl);
@@ -197,7 +216,8 @@ export function sanitizeDesign(raw: RawDesign, ctx: SanitizeContext): SanitizeRe
 
   const platform: Platform =
     typeof raw.platform === "string" && PLATFORMS.has(raw.platform) ? (raw.platform as Platform) : "unknown";
-  const category = typeof raw.category === "string" && categories.has(raw.category) ? raw.category : undefined;
+  const category =
+    typeof raw.category === "string" && categories.has(raw.category) ? raw.category : undefined;
 
   const ttl = adapter.capabilities.cacheTtlSeconds;
   const candidate = {
@@ -209,7 +229,9 @@ export function sanitizeDesign(raw: RawDesign, ctx: SanitizeContext): SanitizeRe
     ...(imageUrl ? { imageUrl } : {}),
     ...(thumbnailUrl ? { thumbnailUrl } : {}),
     ...(creatorName ? { creator: { name: creatorName, ...(creatorUrl ? { url: creatorUrl } : {}) } } : {}),
-    ...(sanitizeText(raw.license, "license", 60, onFlag) ? { license: sanitizeText(raw.license, "license", 60) } : {}),
+    ...(sanitizeText(raw.license, "license", 60, onFlag)
+      ? { license: sanitizeText(raw.license, "license", 60) }
+      : {}),
     attribution:
       (adapter.ownerContent ? sanitizeText(raw.attribution, "attribution", 300, onFlag) : undefined) ??
       renderAttribution(adapter.attributionTemplate, creatorName),
@@ -217,11 +239,15 @@ export function sanitizeDesign(raw: RawDesign, ctx: SanitizeContext): SanitizeRe
     ...(category ? { category } : {}),
     tags,
     ...(palette.length ? { palette } : {}),
-    ...(sanitizeText(raw.summary, "summary", 500, onFlag) ? { summary: sanitizeText(raw.summary, "summary", 500) } : {}),
-    ...(raw.analysis && adapter.ownerContent ? (() => {
-      const a = sanitizeAnalysis(raw.analysis, onFlag);
-      return a ? { analysis: a } : {};
-    })() : {}),
+    ...(sanitizeText(raw.summary, "summary", 500, onFlag)
+      ? { summary: sanitizeText(raw.summary, "summary", 500) }
+      : {}),
+    ...(raw.analysis && adapter.ownerContent
+      ? (() => {
+          const a = sanitizeAnalysis(raw.analysis, onFlag);
+          return a ? { analysis: a } : {};
+        })()
+      : {}),
     fetchedAt: now.toISOString(),
     ...(ttl > 0 ? { expiresAt: new Date(now.getTime() + ttl * 1000).toISOString() } : {}),
   };

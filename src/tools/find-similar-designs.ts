@@ -3,9 +3,16 @@ import { ATTRIBUTION_NOTICE, publicResults, ResultListOutput } from "./shared.js
 import type { ToolDefinition } from "./types.js";
 
 const inputSchema = {
-  id: z.string().min(3).max(170).describe("Seed design id (from a search result). It is excluded from the results."),
+  id: z
+    .string()
+    .min(3)
+    .max(170)
+    .describe("Seed design id (from a search result). It is excluded from the results."),
   limit: z.number().int().min(1).max(20).default(8).describe("How many similar designs to return (1-20)."),
-  same_source_only: z.boolean().optional().describe("If true, only return designs from the seed's own source."),
+  same_source_only: z
+    .boolean()
+    .optional()
+    .describe("If true, only return designs from the seed's own source."),
 };
 
 export const findSimilarDesigns: ToolDefinition<typeof inputSchema> = {
@@ -18,7 +25,12 @@ export const findSimilarDesigns: ToolDefinition<typeof inputSchema> = {
   scope: "read:search",
   inputSchema,
   outputSchema: z.object(ResultListOutput),
-  annotations: { title: "Find similar designs", readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    title: "Find similar designs",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   async handler(args, ctx) {
     const out = await ctx.services.similar.find(args.id, args.limit, args.same_source_only ?? false, ctx);
     return {

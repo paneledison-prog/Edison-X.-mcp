@@ -25,7 +25,10 @@ const size = (v: unknown): number => Buffer.byteLength(JSON.stringify(v));
  * Keep the response under the cap: drop items from the end of the largest array until it fits and
  * flag `truncated: true`. A trimmed page cannot be continued, so `next_cursor` is removed too.
  */
-export function capSize(data: Record<string, unknown>, maxBytes = MAX_RESPONSE_BYTES): Record<string, unknown> {
+export function capSize(
+  data: Record<string, unknown>,
+  maxBytes = MAX_RESPONSE_BYTES,
+): Record<string, unknown> {
   if (size(data) <= maxBytes) return data;
   const out: Record<string, unknown> = { ...data, truncated: true };
   delete out.next_cursor;
@@ -69,7 +72,9 @@ export async function runTool<Shape extends ZodRawShape>(
     const ctx: ToolContext = { principal, signal, now: deps.clock(), requestId, services: deps.services };
     const output = await new Promise<Awaited<ReturnType<typeof def.handler>>>((resolve, reject) => {
       signal.addEventListener("abort", () => reject(new TimeoutError()), { once: true });
-      def.handler(args, ctx).then(resolve, (e: unknown) => reject(e instanceof Error ? e : new Error("tool failed")));
+      def
+        .handler(args, ctx)
+        .then(resolve, (e: unknown) => reject(e instanceof Error ? e : new Error("tool failed")));
     });
     const data = capSize(output.data);
     deps.metrics.inc("edison_tool_calls_total", { tool: def.name, outcome: "ok" });

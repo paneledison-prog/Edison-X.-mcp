@@ -75,16 +75,36 @@ export function createApp(config: Config, overrides: AppOverrides = {}): App {
     register = new Map();
   }
 
-  const adapters: SourceAdapter[] = [new LibraryAdapter(repo, config.libraryImageHosts), ...(overrides.adapters ?? [])];
+  const adapters: SourceAdapter[] = [
+    new LibraryAdapter(repo, config.libraryImageHosts),
+    ...(overrides.adapters ?? []),
+  ];
   const oauthProviders = overrides.oauthProviders ?? new Map<string, OAuthProvider>();
   let pinterestProvider: PinterestConnections | undefined;
-  if (config.pinterest && config.enabledSources.includes(PINTEREST_ID) && !adapters.some((a) => a.id === PINTEREST_ID)) {
+  if (
+    config.pinterest &&
+    config.enabledSources.includes(PINTEREST_ID) &&
+    !adapters.some((a) => a.id === PINTEREST_ID)
+  ) {
     const client = new PinterestClient({ ...config.pinterest, fetcher: overrides.pinterestFetcher });
-    const connections = new PinterestConnections(repo, client, config.pinterest, config.tokenEncryptionKey, clock);
+    const connections = new PinterestConnections(
+      repo,
+      client,
+      config.pinterest,
+      config.tokenEncryptionKey,
+      clock,
+    );
     adapters.push(new PinterestAdapter(connections, client));
     pinterestProvider = connections;
   }
-  const registry = loadSources({ enabledIds: config.enabledSources, adapters, register, now: clock(), logger, audit });
+  const registry = loadSources({
+    enabledIds: config.enabledSources,
+    adapters,
+    register,
+    now: clock(),
+    logger,
+    audit,
+  });
 
   // A source the registry refused must not be connectable either.
   if (pinterestProvider && registry.get(PINTEREST_ID)) oauthProviders.set(PINTEREST_ID, pinterestProvider);
@@ -93,7 +113,12 @@ export function createApp(config: Config, overrides: AppOverrides = {}): App {
   if (lib && repo.countDesigns(LIBRARY_ID) === 0 && existsSync(config.librarySeedPath)) {
     const res = importLibraryFile(config.librarySeedPath, {
       repo,
-      adapter: { id: lib.adapter.id, attributionTemplate: lib.adapter.attributionTemplate, capabilities: lib.capabilities, ownerContent: true },
+      adapter: {
+        id: lib.adapter.id,
+        attributionTemplate: lib.adapter.attributionTemplate,
+        capabilities: lib.capabilities,
+        ownerContent: true,
+      },
       now: clock(),
     });
     logger.info({ imported: res.imported, rejected: res.rejected.length }, "seeded the library");

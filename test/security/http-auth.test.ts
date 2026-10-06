@@ -28,7 +28,18 @@ describe("authentication", () => {
 
   it("rejects missing, malformed, unknown and wrongly-prefixed keys with 401", async () => {
     const real = app.keys.create({ name: "a" }).key;
-    for (const auth of [undefined, "", "Bearer", "Bearer ", "Basic abc", "bearer " + real, "Bearer ex_short", `Bearer ${real}x`, `Bearer ex_${"A".repeat(43)}`, `Token ${real}`]) {
+    for (const auth of [
+      undefined,
+      "",
+      "Bearer",
+      "Bearer ",
+      "Basic abc",
+      "bearer " + real,
+      "Bearer ex_short",
+      `Bearer ${real}x`,
+      `Bearer ex_${"A".repeat(43)}`,
+      `Token ${real}`,
+    ]) {
       const r = await post(rpc("tools/list"), auth === undefined ? {} : { Authorization: auth });
       expect(r.status, String(auth)).toBe(401);
       expect(r.headers.get("www-authenticate")).toMatch(/Bearer/);
@@ -54,7 +65,10 @@ describe("authentication", () => {
 
   it("a second, different agent connects with its own key and no code changes", async () => {
     const a = app.keys.create({ name: "agent-a", scopes: ["read:search", "read:design"] });
-    const b = app.keys.create({ name: "agent-b", scopes: ["read:search", "read:design", "write:collections"] });
+    const b = app.keys.create({
+      name: "agent-b",
+      scopes: ["read:search", "read:design", "write:collections"],
+    });
     const ca = await mcpClient(http.url, a.key);
     const cb = await mcpClient(http.url, b.key);
     const ra = await ca.callTool({ name: "create_collection", arguments: { name: "x" } });
@@ -67,7 +81,8 @@ describe("authentication", () => {
 
   it("blunts key guessing: repeated failures from one address are blocked", async () => {
     let last = 0;
-    for (let i = 0; i < 25; i++) last = (await post(rpc("tools/list"), { Authorization: "Bearer nope" })).status;
+    for (let i = 0; i < 25; i++)
+      last = (await post(rpc("tools/list"), { Authorization: "Bearer nope" })).status;
     expect(last).toBe(429);
   });
 });
@@ -93,10 +108,22 @@ describe("scopes", () => {
   it("denies a tool call without the scope, before any work, and audits it", async () => {
     const { key } = app.keys.create({ name: "reader", scopes: ["read:search"] });
     const client = await mcpClient(http.url, key);
-    const r = await client.callTool({ name: "get_design", arguments: { id: "library:fitness-dashboard-dark" } });
+    const r = await client.callTool({
+      name: "get_design",
+      arguments: { id: "library:fitness-dashboard-dark" },
+    });
     expect(r.isError).toBe(true);
     expect(JSON.stringify(r.content)).toMatch(/read:design/);
-    const w = await client.callTool({ name: "submit_design", arguments: { title: "t", source_url: "https://example.com/x", attribution: "a", license: "owned", origin: "owned" } });
+    const w = await client.callTool({
+      name: "submit_design",
+      arguments: {
+        title: "t",
+        source_url: "https://example.com/x",
+        attribution: "a",
+        license: "owned",
+        origin: "owned",
+      },
+    });
     expect(w.isError).toBe(true);
     const audit = app.repo.listAudit({ event: "scope_denied", limit: 10 });
     expect(audit.map((a) => a.details.scope).sort()).toEqual(["read:design", "write:library"]);
@@ -108,12 +135,24 @@ describe("scopes", () => {
     const client = await mcpClient(http.url, key);
     const { tools } = await client.listTools();
     for (const t of tools) {
-      const args: Record<string, unknown> = {
-        search_inspiration: { query: "a" }, get_design: { id: "library:x" }, find_similar_designs: { id: "library:x" }, get_inspiration_brief: { goal: "a" },
-        add_to_collection: { collection_id: "col_x", design_id: "library:x" }, create_collection: { name: "a" }, get_collection: { collection_id: "col_x" },
-        get_connection_status: { source: "library" },
-        submit_design: { title: "t", source_url: "https://example.com/x", attribution: "a", license: "owned", origin: "owned" },
-      }[t.name] ?? {};
+      const args: Record<string, unknown> =
+        {
+          search_inspiration: { query: "a" },
+          get_design: { id: "library:x" },
+          find_similar_designs: { id: "library:x" },
+          get_inspiration_brief: { goal: "a" },
+          add_to_collection: { collection_id: "col_x", design_id: "library:x" },
+          create_collection: { name: "a" },
+          get_collection: { collection_id: "col_x" },
+          get_connection_status: { source: "library" },
+          submit_design: {
+            title: "t",
+            source_url: "https://example.com/x",
+            attribution: "a",
+            license: "owned",
+            origin: "owned",
+          },
+        }[t.name] ?? {};
       const r = await client.callTool({ name: t.name, arguments: args });
       expect(r.isError, t.name).toBe(true);
       expect(JSON.stringify(r.content), t.name).toMatch(/lacks the required scope/);
@@ -141,14 +180,18 @@ describe("rate limits and request limits", () => {
   it("enforces the daily limit independently", async () => {
     const { key } = app.keys.create({ name: "daily", ratePerDay: 2 });
     const codes = [];
-    for (let i = 0; i < 3; i++) codes.push((await post(rpc("tools/list", {}, i), { Authorization: `Bearer ${key}` })).status);
+    for (let i = 0; i < 3; i++)
+      codes.push((await post(rpc("tools/list", {}, i), { Authorization: `Bearer ${key}` })).status);
     expect(codes).toEqual([200, 200, 429]);
   });
 
   it("rejects bodies over 100 KB with 413 and invalid JSON with 400", async () => {
     const { key } = app.keys.create({ name: "big" });
     const auth = { Authorization: `Bearer ${key}` };
-    const big = await post(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: { pad: "x".repeat(150_000) } }), auth);
+    const big = await post(
+      JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: { pad: "x".repeat(150_000) } }),
+      auth,
+    );
     expect(big.status).toBe(413);
     const bad = await post("{not json", auth);
     expect(bad.status).toBe(400);
@@ -163,12 +206,21 @@ describe("rate limits and request limits", () => {
 
   it("rejects foreign origins and unknown hosts (DNS rebinding)", async () => {
     const { key } = app.keys.create({ name: "o" });
-    const origin = await post(rpc("tools/list"), { Authorization: `Bearer ${key}`, Origin: "https://evil.example" });
+    const origin = await post(rpc("tools/list"), {
+      Authorization: `Bearer ${key}`,
+      Origin: "https://evil.example",
+    });
     expect(origin.status).toBe(403);
     // fetch() ignores a Host override, so use a raw request.
     const status = await new Promise<number>((resolve, reject) => {
       const req = request(
-        { host: "127.0.0.1", port: http.port, path: "/mcp", method: "POST", headers: { ...MCP_HEADERS, Authorization: `Bearer ${key}`, Host: "evil.example" } },
+        {
+          host: "127.0.0.1",
+          port: http.port,
+          path: "/mcp",
+          method: "POST",
+          headers: { ...MCP_HEADERS, Authorization: `Bearer ${key}`, Host: "evil.example" },
+        },
         (res) => {
           res.resume();
           resolve(res.statusCode ?? 0);
@@ -190,7 +242,9 @@ describe("operational endpoints", () => {
     const ready = await fetch(`${http.url}/readyz`, { headers: { Authorization: `Bearer ${reader.key}` } });
     expect(ready.status).toBe(200);
     expect(await ready.json()).toEqual({ status: "ready", database: "ok", sources: { library: "ok" } });
-    expect((await fetch(`${http.url}/metrics`, { headers: { Authorization: `Bearer ${reader.key}` } })).status).toBe(403);
+    expect(
+      (await fetch(`${http.url}/metrics`, { headers: { Authorization: `Bearer ${reader.key}` } })).status,
+    ).toBe(403);
     const m = await fetch(`${http.url}/metrics`, { headers: { Authorization: `Bearer ${admin.key}` } });
     expect(m.status).toBe(200);
     const text = await m.text();

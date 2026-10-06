@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { KeyService } from "../auth/keys.js";
 import { parseScopes } from "../auth/scopes.js";
-import { fail, openCli } from "./context.js";
+import { CliError, openCli, reportAndSetExit } from "./context.js";
 
 const USAGE = `Usage:
   keys:create --name <name> [--scopes <preset|a,b>] [--rate-per-min N] [--rate-per-day N]
@@ -25,11 +25,11 @@ try {
         "rate-per-day": { type: "string" },
       },
     });
-    if (!values.name) fail(`--name is required.\n\n${USAGE}`);
+    if (!values.name) throw new CliError(`--name is required.\n\n${USAGE}`);
     const num = (v: string | undefined): number | undefined => {
       if (v === undefined) return undefined;
       const n = Number(v);
-      if (!Number.isInteger(n) || n < 1) fail("Rate limits must be positive integers.");
+      if (!Number.isInteger(n) || n < 1) throw new CliError("Rate limits must be positive integers.");
       return n;
     };
     const issued = keys.create({
@@ -49,18 +49,20 @@ try {
     if (rows.length === 0) console.log("No keys.");
     for (const k of rows) {
       const status = k.revokedAt ? `revoked ${k.revokedAt}` : "active";
-      console.log(`${k.keyId}  ${k.keyPrefix}…  ${k.principal.name}  [${k.principal.scopes.join(",")}]  ${status}  last used: ${k.lastUsedAt ?? "never"}`);
+      console.log(
+        `${k.keyId}  ${k.keyPrefix}…  ${k.principal.name}  [${k.principal.scopes.join(",")}]  ${status}  last used: ${k.lastUsedAt ?? "never"}`,
+      );
     }
   } else if (command === "revoke") {
     const id = rest[0];
-    if (!id) fail(`A key id is required.\n\n${USAGE}`);
-    if (!keys.revoke(id)) fail(`No key with id ${id}.`);
+    if (!id) throw new CliError(`A key id is required.\n\n${USAGE}`);
+    if (!keys.revoke(id)) throw new CliError(`No key with id ${id}.`);
     console.log(`Revoked ${id}. It stops working on the next request.`);
   } else {
-    fail(USAGE);
+    throw new CliError(USAGE);
   }
 } catch (err) {
-  fail(err instanceof Error ? err.message : "Command failed.");
+  reportAndSetExit(err);
 } finally {
   ctx.repo.close();
 }

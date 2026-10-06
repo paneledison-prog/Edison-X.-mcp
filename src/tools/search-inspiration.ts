@@ -8,9 +8,14 @@ const inputSchema = {
     .string()
     .min(1)
     .max(200)
-    .describe("Plain-words description of what you are building, e.g. 'dark fitness dashboard, mobile'. Mention the screen type and mood."),
+    .describe(
+      "Plain-words description of what you are building, e.g. 'dark fitness dashboard, mobile'. Mention the screen type and mood.",
+    ),
   platform: PlatformInput,
-  category: z.enum(CATEGORIES).optional().describe("Screen category (see list_taxonomy). Designs in this category rank higher."),
+  category: z
+    .enum(CATEGORIES)
+    .optional()
+    .describe("Screen category (see list_taxonomy). Designs in this category rank higher."),
   style: z
     .array(z.string().min(1).max(40))
     .max(5)
@@ -21,14 +26,20 @@ const inputSchema = {
     .min(1)
     .max(30)
     .optional()
-    .describe("A dominant color as hex (e.g. #1e88e5) or a basic color name. Designs with a close palette color rank higher."),
+    .describe(
+      "A dominant color as hex (e.g. #1e88e5) or a basic color name. Designs with a close palette color rank higher.",
+    ),
   sources: z
     .array(z.string().min(1).max(32))
     .max(10)
     .optional()
     .describe("Source ids to search (see list_sources). Default: all enabled sources."),
   limit: z.number().int().min(1).max(20).default(8).describe("How many results to return (1-20)."),
-  cursor: z.string().max(1000).optional().describe("The next_cursor from a previous response, to fetch the next page of the same search."),
+  cursor: z
+    .string()
+    .max(1000)
+    .optional()
+    .describe("The next_cursor from a previous response, to fetch the next page of the same search."),
 };
 
 export const searchInspiration: ToolDefinition<typeof inputSchema> = {
@@ -42,7 +53,12 @@ export const searchInspiration: ToolDefinition<typeof inputSchema> = {
   scope: "read:search",
   inputSchema,
   outputSchema: z.object(ResultListOutput),
-  annotations: { title: "Search UI design inspiration", readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+  annotations: {
+    title: "Search UI design inspiration",
+    readOnlyHint: true,
+    idempotentHint: true,
+    openWorldHint: true,
+  },
   async handler(args, ctx) {
     const out = await ctx.services.search.search(
       {

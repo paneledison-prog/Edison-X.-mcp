@@ -5,7 +5,10 @@ import { LIBRARY_ID } from "../sources/library/index.js";
 import { fail } from "./context.js";
 
 const file = process.argv[2];
-if (!file) fail("Usage: library:import <designs.json>\nThe file looks like library/seed-designs.json: { \"designs\": [ ... ] }.");
+if (!file)
+  fail(
+    'Usage: library:import <designs.json>\nThe file looks like library/seed-designs.json: { "designs": [ ... ] }.',
+  );
 try {
   process.loadEnvFile();
 } catch {
@@ -17,11 +20,21 @@ try {
   if (!lib) fail("The library source is not loaded. Check ENABLED_SOURCES and its entry in docs/SOURCES.md.");
   const result = importLibraryFile(file, {
     repo: app.repo,
-    adapter: { id: lib.adapter.id, attributionTemplate: lib.adapter.attributionTemplate, capabilities: lib.capabilities, ownerContent: true },
+    adapter: {
+      id: lib.adapter.id,
+      attributionTemplate: lib.adapter.attributionTemplate,
+      capabilities: lib.capabilities,
+      ownerContent: true,
+    },
     now: new Date(),
-    onFlag: (e) => app.audit.record("sanitizer_flag", null, { source: "library", field: e.field, rule: e.rule }),
+    onFlag: (e) =>
+      app.audit.record("sanitizer_flag", null, { source: "library", field: e.field, rule: e.rule }),
   });
-  app.audit.record("library_submission", null, { via: "cli", imported: result.imported, rejected: result.rejected.length });
+  app.audit.record("library_submission", null, {
+    via: "cli",
+    imported: result.imported,
+    rejected: result.rejected.length,
+  });
   console.log(`Imported ${result.imported} design(s).`);
   for (const r of result.rejected) console.log(`  rejected ${r.sourceId}: ${r.reason}`);
   if (result.rejected.length > 0) process.exitCode = 2;

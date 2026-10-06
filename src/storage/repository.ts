@@ -78,9 +78,15 @@ export interface DesignRepository {
   upsertDesign(design: Design, opts?: DesignWriteOptions): void;
   getDesign(id: string, viewer: ViewerContext): Design | null;
   /** Full-text candidates ordered best-first. Rows are visible to the viewer only. */
-  searchByTerms(terms: string[], opts: { sources?: string[]; limit: number; viewer: ViewerContext }): ScoredDesign[];
+  searchByTerms(
+    terms: string[],
+    opts: { sources?: string[]; limit: number; viewer: ViewerContext },
+  ): ScoredDesign[];
   /** Candidates sharing category/tags/platform for similarity ranking. */
-  similarityCandidates(seed: Design, opts: { sources?: string[]; limit: number; viewer: ViewerContext }): Design[];
+  similarityCandidates(
+    seed: Design,
+    opts: { sources?: string[]; limit: number; viewer: ViewerContext },
+  ): Design[];
   countDesigns(source?: string): number;
   /** Returns true if a model analysis was stored (never overwrites owner analysis). */
   setModelAnalysis(id: string, analysis: DesignAnalysis): boolean;
@@ -94,7 +100,13 @@ export interface DesignRepository {
   /** Removes a user's private cached data for one source. */
   purgePrincipalSource(principalId: string, source: string): number;
   getSourceCache(key: string, now: Date): SourceCacheEntry | null;
-  putSourceCache(key: string, source: string, principalId: string, entry: SourceCacheEntry, expiresAt: Date): void;
+  putSourceCache(
+    key: string,
+    source: string,
+    principalId: string,
+    entry: SourceCacheEntry,
+    expiresAt: Date,
+  ): void;
 }
 
 export interface AuthRepository {
@@ -129,12 +141,21 @@ export interface OpsRepository {
   appendAudit(event: string, principalId: string | null, details: Record<string, unknown>, at: Date): void;
   listAudit(opts: { event?: string; limit: number }): AuditEntry[];
   addAnalysisUsage(day: string, usage: { costUsd: number; inputTokens: number; outputTokens: number }): void;
-  getAnalysisUsage(day: string): { costUsd: number; inputTokens: number; outputTokens: number; calls: number };
+  getAnalysisUsage(day: string): {
+    costUsd: number;
+    inputTokens: number;
+    outputTokens: number;
+    calls: number;
+  };
   ping(): boolean;
   backupTo(path: string): Promise<void>;
   close(): void;
 }
 
-export type Repository = DesignRepository & AuthRepository & ConnectionRepository & CollectionRepository & OpsRepository;
+export type Repository = DesignRepository &
+  AuthRepository &
+  ConnectionRepository &
+  CollectionRepository &
+  OpsRepository;
 
 export type { Principal, Scope };

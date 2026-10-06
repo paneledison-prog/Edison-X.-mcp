@@ -1,6 +1,6 @@
 # Admin console with filterable data table
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** admin
 - **Platform:** web

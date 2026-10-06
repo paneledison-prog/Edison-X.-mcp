@@ -83,7 +83,10 @@ export class SearchService {
           queried.push(id);
           return res.designs;
         } catch (err) {
-          skipped.push({ source: id, reason: err instanceof SourceError ? err.reason.replace(/_/g, " ") : "error" });
+          skipped.push({
+            source: id,
+            reason: err instanceof SourceError ? err.reason.replace(/_/g, " ") : "error",
+          });
           return [];
         }
       }),
@@ -94,7 +97,11 @@ export class SearchService {
     const terms = [input.query, ...input.style, ...(input.category ? [input.category] : [])];
     const text = scorer.score(terms, candidates);
     const deduped = dedupeBySourceUrl(
-      candidates.map((design) => ({ design, text: text.get(design.id) ?? 0, sourceHealth: registry.health.health(design.source) })),
+      candidates.map((design) => ({
+        design,
+        text: text.get(design.id) ?? 0,
+        sourceHealth: registry.health.health(design.source),
+      })),
     );
     const allRanked = rank(deduped, {
       platform: input.platform,
@@ -104,14 +111,28 @@ export class SearchService {
       now: ctx.now,
     }).slice(0, MAX_CANDIDATES);
 
-    const qh = CursorCodec.queryHash([input.query, input.platform, input.category, input.style, input.colorHint, [...(input.sources ?? [])].sort(), input.limit]);
-    const offset = input.cursor ? cursors.decode(input.cursor, qh, ctx.principal.id, ctx.now.getTime()).offset : 0;
-    if (offset > allRanked.length) throw new ValidationError("The cursor points past the end of the results.");
+    const qh = CursorCodec.queryHash([
+      input.query,
+      input.platform,
+      input.category,
+      input.style,
+      input.colorHint,
+      [...(input.sources ?? [])].sort(),
+      input.limit,
+    ]);
+    const offset = input.cursor
+      ? cursors.decode(input.cursor, qh, ctx.principal.id, ctx.now.getTime()).offset
+      : 0;
+    if (offset > allRanked.length)
+      throw new ValidationError("The cursor points past the end of the results.");
     const slice = allRanked.slice(offset, offset + input.limit);
     const nextOffset = offset + input.limit;
     return {
       page: slice.map((r) => ({ ...r, canHotlink: hotlink.get(r.design.source) ?? false })),
-      nextCursor: nextOffset < allRanked.length ? cursors.encode(nextOffset, qh, ctx.principal.id, ctx.now.getTime()) : undefined,
+      nextCursor:
+        nextOffset < allRanked.length
+          ? cursors.encode(nextOffset, qh, ctx.principal.id, ctx.now.getTime())
+          : undefined,
       totalEstimate: allRanked.length,
       sourcesQueried: queried.sort(),
       sourcesSkipped: skipped.sort((a, b) => a.source.localeCompare(b.source)),

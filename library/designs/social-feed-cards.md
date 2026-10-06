@@ -1,6 +1,6 @@
 # Social feed with composer and reaction bar
 
-*Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned.*
+_Original Edison X reference pattern. Owner-authored; contains no third-party content. License: owned._
 
 - **Category:** feed
 - **Platform:** ios
