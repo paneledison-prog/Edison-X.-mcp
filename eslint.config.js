@@ -34,7 +34,7 @@ export default tseslint.config(
   },
   {
     // The CLI and the stdio bootstrap print to the terminal on purpose.
-    files: ["src/cli/**/*.ts", "test/**/*.ts"],
+    files: ["src/cli/**/*.ts", "test/**/*.ts", "scripts/**/*.ts"],
     rules: { "no-console": "off" },
   },
   {

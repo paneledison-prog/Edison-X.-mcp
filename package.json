@@ -47,7 +47,6 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ci": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
     "audit:deps": "pnpm audit --audit-level=high",
     "gen:key": "node -e \"console.log(require(\\\"node:crypto\\\").randomBytes(32).toString(\\\"base64\\\"))\"",
     "keys:create": "tsx src/cli/keys.ts create",
@@ -60,6 +59,7 @@
     "db:backup": "tsx src/cli/db.ts backup",
     "db:restore": "tsx src/cli/db.ts restore",
     "load:test": "tsx scripts/load-test.ts",
-    "e2e:transcripts": "tsx scripts/e2e-transcripts.ts"
+    "e2e:transcripts": "tsx scripts/e2e-transcripts.ts",
+    "verify": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   }
 }

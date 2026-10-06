@@ -58,6 +58,21 @@ describe("config", () => {
     expect(() => loadConfig({ ...base, PORT: "99999" })).toThrow(/PORT/);
   });
 
+  it("requires PUBLIC_BASE_URL for http in production so requests are not silently rejected by the host check", () => {
+    expect(() => loadConfig({ ...base, NODE_ENV: "production", TRANSPORT: "http" })).toThrow(
+      /PUBLIC_BASE_URL/,
+    );
+    expect(
+      loadConfig({
+        ...base,
+        NODE_ENV: "production",
+        TRANSPORT: "http",
+        PUBLIC_BASE_URL: "https://edison.example.com",
+      }).transport,
+    ).toBe("http");
+    expect(loadConfig({ ...base, NODE_ENV: "production", TRANSPORT: "stdio" }).transport).toBe("stdio");
+  });
+
   it("insists on https in production", () => {
     expect(() =>
       loadConfig({ ...base, NODE_ENV: "production", PUBLIC_BASE_URL: "http://x.example.com" }),

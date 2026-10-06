@@ -78,6 +78,10 @@ export async function runTool<Shape extends ZodRawShape>(
     });
     const data = capSize(output.data);
     deps.metrics.inc("edison_tool_calls_total", { tool: def.name, outcome: "ok" });
+    deps.logger.debug(
+      { tool: def.name, principal: principal.id, requestId, ms: Math.round(performance.now() - started) },
+      "tool call",
+    );
     return {
       content: [{ type: "text", text: JSON.stringify(data) }, ...(output.extraContent ?? [])],
       structuredContent: data,
@@ -85,6 +89,10 @@ export async function runTool<Shape extends ZodRawShape>(
   } catch (err) {
     const client = toClientError(err);
     deps.metrics.inc("edison_tool_calls_total", { tool: def.name, outcome: client.code });
+    deps.logger.debug(
+      { tool: def.name, principal: principal.id, requestId, outcome: client.code },
+      "tool call failed",
+    );
     if (client.code === "internal") deps.logger.error({ err, tool: def.name, requestId }, "tool failed");
     return errorResult(client.message);
   } finally {

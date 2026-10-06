@@ -463,8 +463,15 @@ describe("key rotation and our own outbound limit", () => {
     const { key, principal } = app.keys.create({ name: "u" });
     const client = await mcpClient(http.url, key);
     await connectPinterest(client);
-    app.repo.db.prepare("UPDATE oauth_connections SET access_token_enc = ? WHERE principal_id = ?").run(Buffer.alloc(60, 1).toString("base64"), principal.id);
-    const out = (await client.callTool({ name: "search_inspiration", arguments: { query: "dashboard", sources: ["pinterest"] } })).structuredContent as {
+    app.repo.db
+      .prepare("UPDATE oauth_connections SET access_token_enc = ? WHERE principal_id = ?")
+      .run(Buffer.alloc(60, 1).toString("base64"), principal.id);
+    const out = (
+      await client.callTool({
+        name: "search_inspiration",
+        arguments: { query: "dashboard", sources: ["pinterest"] },
+      })
+    ).structuredContent as {
       sources_skipped: Array<{ reason: string }>;
     };
     expect(out.sources_skipped[0]?.reason).toBe("not connected");

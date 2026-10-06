@@ -21,7 +21,7 @@ MCP spec and SDK docs were read from the installed package's type definitions (n
 
 | #   | Scope                                                                                                                 | Proof                                                     |
 | --- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| 0   | Scaffold, strict TS, lint/format/test, `config.ts`, source register, fail-closed registry                             | `pnpm ci`; registry refuses a source with any blank field |
+| 0   | Scaffold, strict TS, lint/format/test, `config.ts`, source register, fail-closed registry                             | `pnpm verify`; registry refuses a source with any blank field |
 | 1   | SQLite repository + migrations, `LibraryAdapter`, 30 seed designs, ranking, `search_inspiration`, `get_design`, stdio | MCP client contract tests; determinism test               |
 | 2   | `find_similar_designs`, `get_inspiration_brief`, `list_taxonomy`, `list_sources`                                      | Contract tests; brief cites only real ids                 |
 | 3   | Streamable HTTP, API keys, scopes, key CLI, rate limits, sanitizer, SSRF guard, redaction, audit, health              | Security suite                                            |

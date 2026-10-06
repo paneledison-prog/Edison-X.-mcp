@@ -129,6 +129,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       problems.push("ANALYSIS_DAILY_COST_CAP: required when ANALYSIS_ENABLED=true");
     if (!e.ANTHROPIC_API_KEY) problems.push("ANTHROPIC_API_KEY: required when ANALYSIS_ENABLED=true");
   }
+  if (e.NODE_ENV === "production" && e.TRANSPORT === "http" && !e.PUBLIC_BASE_URL) {
+    problems.push(
+      "PUBLIC_BASE_URL: required for the http transport in production (it is the host the server accepts requests for)",
+    );
+  }
   if (e.NODE_ENV === "production" && e.PUBLIC_BASE_URL && !e.PUBLIC_BASE_URL.startsWith("https://")) {
     problems.push("PUBLIC_BASE_URL: must be https in production");
   }

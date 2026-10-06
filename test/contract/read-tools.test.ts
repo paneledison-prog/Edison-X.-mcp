@@ -86,6 +86,36 @@ describe("tool registry contract", () => {
   });
 });
 
+describe("result encoding", () => {
+  it("returns the same compact JSON in content and structuredContent for every read tool", async () => {
+    const calls: Array<[string, Record<string, unknown>]> = [
+      ["search_inspiration", { query: "dashboard" }],
+      ["get_design", { id: "library:fitness-dashboard-dark" }],
+      ["find_similar_designs", { id: "library:fitness-dashboard-dark" }],
+      ["get_inspiration_brief", { goal: "fitness dashboard" }],
+      ["list_taxonomy", {}],
+      ["list_sources", {}],
+      ["list_collections", {}],
+    ];
+    for (const [name, args] of calls) {
+      const r = await c.call(name, args);
+      expect(r.isError, name).toBeFalsy();
+      expect(r.content).toHaveLength(1);
+      expect(JSON.parse(textOf(r)), name).toEqual(r.structuredContent);
+      expect(textOf(r), name).not.toMatch(/\n\s/);
+      expect(Buffer.byteLength(textOf(r)), name).toBeLessThanOrEqual(50_000);
+    }
+  });
+
+  it("failures are short, actionable, free of internals, and carry no structured content", async () => {
+    const r = await c.call("get_design", { id: "library:does-not-exist" });
+    expect(r.isError).toBe(true);
+    expect(r.structuredContent).toBeUndefined();
+    expect(textOf(r).length).toBeLessThan(200);
+    expect(textOf(r)).not.toMatch(/\/home|node_modules|SELECT|at \w+\.\w+ \(/);
+  });
+});
+
 describe("search_inspiration", () => {
   it("returns credited, linked, schema-valid results with an attribution notice", async () => {
     const r = await c.call("search_inspiration", { query: "dark fitness dashboard", platform: "web" });

@@ -3,6 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import type { App } from "../app.js";
 import { hasScope } from "../auth/scopes.js";
 import { AuthError, NotFoundError, RateLimitError, ValidationError } from "../errors.js";
+import { sha256Hex } from "../security/crypto.js";
 import { enforceKeyRateLimit, FailureLimiter } from "../security/ratelimit.js";
 import { buildServer } from "../server.js";
 
@@ -71,6 +72,9 @@ export function createHttpServer(app: App): Server {
     return req.socket.remoteAddress ?? "unknown";
   };
 
+  /** Audit rows keep a short one-way hash of the address, enough to correlate attempts without storing the address itself. */
+  const anonymise = (ip: string): string => sha256Hex(`${config.tokenEncryptionKey}:${ip}`).slice(0, 12);
+
   const hostnameOf = (host: string | undefined): string => {
     if (!host) return "";
     const h = host.startsWith("[") ? host.slice(1, host.indexOf("]")) : (host.split(":")[0] ?? "");
@@ -97,10 +101,10 @@ export function createHttpServer(app: App): Server {
     } catch (err) {
       if (err instanceof AuthError) {
         metrics.inc("edison_auth_denied_total");
-        if (authFailures.record(ip) <= 5) audit.record("auth_denied", null, { ip });
+        if (authFailures.record(ip) <= 5) audit.record("auth_denied", null, { client: anonymise(ip) });
       } else if (err instanceof RateLimitError) {
         metrics.inc("edison_rate_limit_hits_total", { scope: "key" });
-        audit.record("rate_limited", null, { ip });
+        audit.record("rate_limited", null, { client: anonymise(ip) });
       }
       throw err;
     }

@@ -71,7 +71,7 @@ Every result carries `source_url`, `attribution` and an `attribution_notice` rem
 
 | Command | Purpose |
 |---|---|
-| `pnpm ci` | lint, typecheck, format check, tests |
+| `pnpm verify` | lint, typecheck, format check, tests |
 | `pnpm build` / `pnpm start` | compile and run |
 | `pnpm keys:create / keys:list / keys:revoke` | manage API keys |
 | `pnpm library:import <file>` | bulk-add designs |
