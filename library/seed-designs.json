@@ -1,0 +1,1432 @@
+{
+ "generatedAt": "2026-10-06T00:00:00Z",
+ "designs": [
+  {
+   "sourceId": "fitness-dashboard-dark",
+   "title": "Dark fitness dashboard with ring progress",
+   "category": "dashboard",
+   "platform": "web",
+   "tags": [
+    "dark",
+    "fitness",
+    "stat-cards",
+    "progress-tracker",
+    "charts"
+   ],
+   "palette": [
+    "#0b0f19",
+    "#151b2b",
+    "#2dd4bf",
+    "#f97316",
+    "#e2e8f0"
+   ],
+   "summary": "Dark workout dashboard: activity rings on top, weekly volume chart below, upcoming sessions in a side column.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/fitness-dashboard-dark.md",
+   "analysis": {
+    "layout": "Two-column: wide main area with ring summary row and chart, narrow right rail with schedule list; sticky left icon nav.",
+    "components": [
+     "icon sidebar",
+     "activity ring",
+     "stat card",
+     "bar chart",
+     "schedule list"
+    ],
+    "typography": "Geometric sans for numbers, 12px uppercase labels, 32px tabular figures for key stats.",
+    "colorUsage": "Near-black surfaces with one teal accent for progress and one orange accent for warnings; text in cool light grey.",
+    "density": "balanced",
+    "buildHints": [
+     "Give each ring its own accent and a numeric center label",
+     "Use tabular numerals so stats do not jitter",
+     "Keep the right rail at about 320px and collapse it below 1100px"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "fitness-tracker-mobile",
+   "title": "Mobile workout tracker with large set logger",
+   "category": "health-fitness",
+   "platform": "ios",
+   "tags": [
+    "mobile",
+    "fitness",
+    "bottom-tab-bar",
+    "forms",
+    "dark"
+   ],
+   "palette": [
+    "#111827",
+    "#1f2937",
+    "#22c55e",
+    "#facc15",
+    "#f9fafb"
+   ],
+   "summary": "Single-column workout logging with big tap targets, a rest timer pill and a bottom tab bar.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/fitness-tracker-mobile.md",
+   "analysis": {
+    "layout": "Single column; sticky top header with timer pill; scrolling list of exercise cards; fixed bottom tab bar with four tabs.",
+    "components": [
+     "bottom tab bar",
+     "exercise card",
+     "set row stepper",
+     "timer pill",
+     "primary button"
+    ],
+    "typography": "Rounded sans, 17px body, 28px bold exercise titles, monospaced timer digits.",
+    "colorUsage": "Dark grey base, green for completed sets, yellow only for the active rest timer.",
+    "density": "balanced",
+    "buildHints": [
+     "Make numeric steppers at least 44px tall",
+     "Show the rest timer as a persistent pill above the tab bar",
+     "Mark completed sets with color and a check, not color alone"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "meal-planner-week",
+   "title": "Weekly meal planner with drag cards",
+   "category": "health-fitness",
+   "platform": "web",
+   "tags": [
+    "light",
+    "calendar",
+    "card-grid",
+    "food",
+    "drag-and-drop"
+   ],
+   "palette": [
+    "#fffaf0",
+    "#f4a261",
+    "#2a9d8f",
+    "#264653",
+    "#e9c46a"
+   ],
+   "summary": "A seven-column week board where recipe cards are dragged into breakfast, lunch and dinner rows.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/meal-planner-week.md",
+   "analysis": {
+    "layout": "Grid of 7 day columns by 3 meal rows; recipe tray docked at the bottom; macro totals pinned in the header.",
+    "components": [
+     "week grid",
+     "recipe card",
+     "drag handle",
+     "macro bar",
+     "tray"
+    ],
+    "typography": "Friendly serif headings with a clean sans for labels.",
+    "colorUsage": "Warm cream background, teal and orange accents for meal types, dark teal text.",
+    "density": "dense",
+    "buildHints": [
+     "Show macro totals per day under each column header",
+     "Allow keyboard moves for accessibility",
+     "Use a dashed drop zone state for empty slots"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "saas-landing-hero",
+   "title": "SaaS landing page with product screenshot hero",
+   "category": "landing-page",
+   "platform": "web",
+   "tags": [
+    "light",
+    "hero-section",
+    "minimal",
+    "saas",
+    "sticky-header"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f5f7ff",
+    "#4f46e5",
+    "#0f172a",
+    "#94a3b8"
+   ],
+   "summary": "Centered headline with two calls to action above a large product screenshot, followed by logo strip and feature trio.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/saas-landing-hero.md",
+   "analysis": {
+    "layout": "Sticky top navigation; centered hero; full-width screenshot with soft shadow; logo strip; three-column feature grid; footer.",
+    "components": [
+     "sticky header",
+     "hero headline",
+     "primary and secondary buttons",
+     "logo strip",
+     "feature card"
+    ],
+    "typography": "Large 56px tight-leading headline, 18px muted subhead, 14px nav.",
+    "colorUsage": "White canvas, one indigo accent on the primary button, slate for text.",
+    "density": "airy",
+    "buildHints": [
+     "Limit the hero to one primary action",
+     "Round screenshot corners and add a faint gradient glow behind it",
+     "Keep the feature grid to three items per row"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "editorial-landing-bold",
+   "title": "Editorial landing page with oversized type",
+   "category": "landing-page",
+   "platform": "web",
+   "tags": [
+    "editorial",
+    "high-contrast",
+    "hero-section",
+    "typography-led",
+    "light"
+   ],
+   "palette": [
+    "#f4efe6",
+    "#111111",
+    "#e63946",
+    "#2b2b2b",
+    "#d8d2c4"
+   ],
+   "summary": "Type-led page: a giant serif headline, narrow text columns and a single red accent.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/editorial-landing-bold.md",
+   "analysis": {
+    "layout": "Asymmetric twelve-column layout; headline spans ten columns; body text in a narrow column offset to the right; thin rules between sections.",
+    "components": [
+     "oversized headline",
+     "pull quote",
+     "rule divider",
+     "text link",
+     "footer index"
+    ],
+    "typography": "High-contrast serif at 120px for the headline, 17px book weight body, small caps for labels.",
+    "colorUsage": "Warm paper background, black text, one red accent used for links and marks.",
+    "density": "airy",
+    "buildHints": [
+     "Let the headline break the grid",
+     "Use thin 1px rules instead of cards",
+     "Reserve the accent color for fewer than five elements"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "product-launch-gradient",
+   "title": "Product launch page with animated gradient",
+   "category": "landing-page",
+   "platform": "web",
+   "tags": [
+    "colorful",
+    "futuristic",
+    "hero-section",
+    "glassmorphism",
+    "dark"
+   ],
+   "palette": [
+    "#0a0a1a",
+    "#6d28d9",
+    "#ec4899",
+    "#22d3ee",
+    "#f8fafc"
+   ],
+   "summary": "Dark launch page with a slow mesh gradient behind frosted cards and an email capture form.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/product-launch-gradient.md",
+   "analysis": {
+    "layout": "Full-viewport hero with centered content; frosted feature cards in a three-up row; sticky mini footer with the form.",
+    "components": [
+     "gradient background",
+     "glass card",
+     "email capture form",
+     "countdown",
+     "badge"
+    ],
+    "typography": "Wide geometric sans, 64px headline, 16px body with generous tracking on labels.",
+    "colorUsage": "Deep navy base, violet to pink gradient, cyan used for the submit button.",
+    "density": "balanced",
+    "buildHints": [
+     "Keep text on glass cards above 4.5:1 contrast",
+     "Pause the gradient animation for reduced-motion users",
+     "Place the form above the fold"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "onboarding-stepper-web",
+   "title": "Three-step onboarding with progress rail",
+   "category": "onboarding",
+   "platform": "web",
+   "tags": [
+    "light",
+    "multi-step-form",
+    "progress-tracker",
+    "minimal"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f1f5f9",
+    "#0ea5e9",
+    "#0f172a",
+    "#64748b"
+   ],
+   "summary": "Centered card walks the user through profile, preferences and invite steps with a left progress rail.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/onboarding-stepper-web.md",
+   "analysis": {
+    "layout": "Split screen: narrow left rail listing steps with check states; right side holds the active form card and a bottom action bar.",
+    "components": [
+     "step rail",
+     "form card",
+     "text input",
+     "choice chips",
+     "back and next buttons"
+    ],
+    "typography": "Clean sans, 24px step titles, 14px helper text.",
+    "colorUsage": "White and pale slate surfaces, sky blue for the active step and primary button.",
+    "density": "airy",
+    "buildHints": [
+     "Allow skipping optional steps",
+     "Save progress after every step",
+     "Show the step count and the time estimate"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "onboarding-swipe-mobile",
+   "title": "Swipeable mobile onboarding with illustrations",
+   "category": "onboarding",
+   "platform": "android",
+   "tags": [
+    "mobile",
+    "illustrated",
+    "carousel",
+    "playful",
+    "colorful"
+   ],
+   "palette": [
+    "#fff7ed",
+    "#fb923c",
+    "#8b5cf6",
+    "#1e1b4b",
+    "#fde68a"
+   ],
+   "summary": "Three full-screen slides with a spot illustration, a short headline and pager dots.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/onboarding-swipe-mobile.md",
+   "analysis": {
+    "layout": "Full-screen pager; illustration in the top 55%; text block and dots below; pinned primary button and skip link.",
+    "components": [
+     "pager dots",
+     "spot illustration",
+     "headline",
+     "primary button",
+     "skip link"
+    ],
+    "typography": "Rounded display face for headlines, 16px body.",
+    "colorUsage": "Warm peach backgrounds that change per slide, purple used for the button.",
+    "density": "airy",
+    "buildHints": [
+     "Keep each slide to one idea",
+     "Put the skip link in the top right",
+     "End with a single clear call to action"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "signin-split-screen",
+   "title": "Sign-in with brand panel and form",
+   "category": "sign-in",
+   "platform": "web",
+   "tags": [
+    "split-screen",
+    "light",
+    "minimal",
+    "forms"
+   ],
+   "palette": [
+    "#ffffff",
+    "#eef2ff",
+    "#4338ca",
+    "#111827",
+    "#9ca3af"
+   ],
+   "summary": "Left half shows a brand panel with a quote, right half shows email and password fields plus social sign-in.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/signin-split-screen.md",
+   "analysis": {
+    "layout": "Two equal columns; form vertically centered at 380px max width; brand panel full height with a tinted background.",
+    "components": [
+     "brand panel",
+     "email field",
+     "password field with reveal",
+     "social button row",
+     "text link"
+    ],
+    "typography": "16px labels above inputs, 28px form title.",
+    "colorUsage": "Indigo brand panel, white form side, red only for error text.",
+    "density": "airy",
+    "buildHints": [
+     "Show inline validation after blur",
+     "Offer a password reveal toggle",
+     "Hide the brand panel under 900px"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "signin-passwordless-mobile",
+   "title": "Passwordless mobile sign-in with code entry",
+   "category": "sign-in",
+   "platform": "ios",
+   "tags": [
+    "mobile",
+    "minimal",
+    "forms",
+    "light"
+   ],
+   "palette": [
+    "#fafafa",
+    "#ffffff",
+    "#111111",
+    "#2563eb",
+    "#a1a1aa"
+   ],
+   "summary": "Email entry followed by a six-box one-time code screen with auto-advance.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/signin-passwordless-mobile.md",
+   "analysis": {
+    "layout": "Single column; large title at top; one field; fixed primary button above the keyboard; code boxes in a centered row.",
+    "components": [
+     "email field",
+     "six digit code boxes",
+     "resend link",
+     "primary button"
+    ],
+    "typography": "System sans, 34px title, 17px body.",
+    "colorUsage": "Near-white background with black text and a blue accent for actions.",
+    "density": "airy",
+    "buildHints": [
+     "Auto-advance between code boxes and support paste",
+     "Offer resend after a visible countdown",
+     "Keep the button above the keyboard"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "ecommerce-grid-filters",
+   "title": "Storefront product grid with left filters",
+   "category": "e-commerce",
+   "platform": "web",
+   "tags": [
+    "card-grid",
+    "filter-bar",
+    "light",
+    "retail"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f8f8f8",
+    "#111111",
+    "#d4af37",
+    "#6b7280"
+   ],
+   "summary": "Product listing with collapsible filter groups, sort control and a four-up image grid.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/ecommerce-grid-filters.md",
+   "analysis": {
+    "layout": "Left filter column at 260px; right grid of four product cards; sort and result count above the grid; pagination below.",
+    "components": [
+     "filter group",
+     "product card",
+     "price tag",
+     "sort select",
+     "pagination"
+    ],
+    "typography": "Neutral sans, 14px product names, 16px bold prices.",
+    "colorUsage": "Mostly white with black text and a gold accent for sale badges.",
+    "density": "balanced",
+    "buildHints": [
+     "Show active filters as removable chips",
+     "Keep image aspect ratios identical",
+     "Preserve filter state in the URL"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "product-page-gallery",
+   "title": "Product detail page with gallery and sticky buy box",
+   "category": "product-page",
+   "platform": "web",
+   "tags": [
+    "light",
+    "sticky-header",
+    "carousel",
+    "retail"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f3f4f6",
+    "#1f2937",
+    "#16a34a",
+    "#9ca3af"
+   ],
+   "summary": "Image gallery on the left, a buy box that stays in view on the right, reviews and specs below.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/product-page-gallery.md",
+   "analysis": {
+    "layout": "Two columns: thumbnail strip plus large image; sticky purchase panel with price, options and add-to-bag; tabs for details.",
+    "components": [
+     "thumbnail strip",
+     "option selector",
+     "add to bag button",
+     "rating summary",
+     "tab bar"
+    ],
+    "typography": "14px body, 28px product title, 24px price.",
+    "colorUsage": "White background, charcoal text, green used for stock status and the primary button.",
+    "density": "balanced",
+    "buildHints": [
+     "Keep the buy box sticky on desktop only",
+     "Show stock and delivery estimate near the button",
+     "Make the image zoom keyboard accessible"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "checkout-single-page",
+   "title": "One-page checkout with order summary",
+   "category": "checkout",
+   "platform": "web",
+   "tags": [
+    "light",
+    "forms",
+    "multi-step-form",
+    "retail"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f9fafb",
+    "#2563eb",
+    "#111827",
+    "#d1d5db"
+   ],
+   "summary": "Contact, shipping and payment sections stacked on the left with a persistent order summary on the right.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/checkout-single-page.md",
+   "analysis": {
+    "layout": "Two columns at 60/40; accordion-style sections with completed states; summary card with line items and totals.",
+    "components": [
+     "accordion section",
+     "address form",
+     "payment fields",
+     "order summary",
+     "place order button"
+    ],
+    "typography": "15px labels, 20px section titles, bold totals.",
+    "colorUsage": "White cards on a light grey page, blue for the primary action, subtle borders.",
+    "density": "balanced",
+    "buildHints": [
+     "Show a progress hint for each section",
+     "Collapse the summary on mobile",
+     "Place the primary button at the end of the form and repeat the total next to it"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "settings-sidebar-tabs",
+   "title": "Settings page with grouped sections",
+   "category": "settings",
+   "platform": "web",
+   "tags": [
+    "light",
+    "sidebar-navigation",
+    "forms",
+    "minimal"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f6f7f9",
+    "#0f766e",
+    "#1f2937",
+    "#9ca3af"
+   ],
+   "summary": "Settings split into account, notifications, billing and security with a left list and form panels on the right.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/settings-sidebar-tabs.md",
+   "analysis": {
+    "layout": "Left vertical section list; right panel with titled cards, each holding labeled controls and a save row.",
+    "components": [
+     "section list",
+     "toggle switch",
+     "labeled input",
+     "danger zone card",
+     "save bar"
+    ],
+    "typography": "14px labels, 20px card titles, helper text in muted grey.",
+    "colorUsage": "Light grey page, white cards, teal toggles and links, red outline for destructive actions.",
+    "density": "balanced",
+    "buildHints": [
+     "Save per card instead of a global save",
+     "Place destructive actions in a separate bordered zone",
+     "Use switches only for instant settings"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "profile-creator-card",
+   "title": "Creator profile with stats and content tabs",
+   "category": "profile",
+   "platform": "web",
+   "tags": [
+    "light",
+    "card-grid",
+    "feed",
+    "social"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f3f4f6",
+    "#db2777",
+    "#111827",
+    "#6b7280"
+   ],
+   "summary": "Profile header with avatar, bio and follower stats above tabs for posts, collections and about.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/profile-creator-card.md",
+   "analysis": {
+    "layout": "Cover band with overlapping avatar; stat row; sticky tab bar; masonry grid of content below.",
+    "components": [
+     "avatar",
+     "stat row",
+     "follow button",
+     "tab bar",
+     "masonry grid"
+    ],
+    "typography": "Bold 28px name, 14px bio, small muted counters.",
+    "colorUsage": "White page, pink accent on the follow button, grey neutrals elsewhere.",
+    "density": "balanced",
+    "buildHints": [
+     "Keep the follow button visible in the sticky bar",
+     "Use skeleton cards while the grid loads",
+     "Truncate bios with a more link"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "social-feed-cards",
+   "title": "Social feed with composer and reaction bar",
+   "category": "feed",
+   "platform": "ios",
+   "tags": [
+    "mobile",
+    "feed",
+    "infinite-scroll",
+    "light",
+    "social"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f2f2f7",
+    "#007aff",
+    "#1c1c1e",
+    "#8e8e93"
+   ],
+   "summary": "Vertical feed of post cards with a composer on top and a compact reaction row under each post.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/social-feed-cards.md",
+   "analysis": {
+    "layout": "Single column; composer card; repeating post cards with header, media, text and action row; tab bar at the bottom.",
+    "components": [
+     "composer",
+     "post card",
+     "reaction row",
+     "avatar",
+     "tab bar"
+    ],
+    "typography": "System sans, 15px body, 13px metadata.",
+    "colorUsage": "White cards on a light grey base, blue for interactive icons.",
+    "density": "balanced",
+    "buildHints": [
+     "Load more posts before the user reaches the end",
+     "Keep action icons at least 44px apart",
+     "Show timestamps in relative form"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "messaging-thread-list",
+   "title": "Messaging app with conversation list and thread",
+   "category": "messaging",
+   "platform": "desktop",
+   "tags": [
+    "chat-thread",
+    "split-screen",
+    "dark",
+    "sidebar-navigation"
+   ],
+   "palette": [
+    "#1a1d21",
+    "#222529",
+    "#4a9eff",
+    "#e8e8e8",
+    "#8b8f94"
+   ],
+   "summary": "Three-pane layout: workspace rail, conversation list and the active thread with a composer.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/messaging-thread-list.md",
+   "analysis": {
+    "layout": "Narrow icon rail, 300px conversation list, flexible thread pane with a pinned composer and a collapsible details panel.",
+    "components": [
+     "workspace rail",
+     "conversation row",
+     "message bubble",
+     "composer",
+     "details panel"
+    ],
+    "typography": "13px dense sans, 15px message text, monospace for code.",
+    "colorUsage": "Charcoal layers with subtle elevation, blue for selection and links.",
+    "density": "dense",
+    "buildHints": [
+     "Group consecutive messages from the same sender",
+     "Show unread counts as small badges",
+     "Support keyboard navigation between conversations"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "search-results-faceted",
+   "title": "Search results page with facets and previews",
+   "category": "search",
+   "platform": "web",
+   "tags": [
+    "search",
+    "filter-bar",
+    "light",
+    "data-dense"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f1f5f9",
+    "#2563eb",
+    "#0f172a",
+    "#64748b"
+   ],
+   "summary": "Large search bar, result list with snippets and facets for type and date on the left.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/search-results-faceted.md",
+   "analysis": {
+    "layout": "Top search bar with suggestions; left facet column; central result list; optional right preview pane.",
+    "components": [
+     "search bar",
+     "facet group",
+     "result row",
+     "snippet highlight",
+     "preview pane"
+    ],
+    "typography": "16px result titles in blue, 14px snippets, 12px metadata.",
+    "colorUsage": "White with slate text; highlight snippets with a pale yellow background.",
+    "density": "dense",
+    "buildHints": [
+     "Show the result count and active filters near the top",
+     "Highlight matched terms in snippets",
+     "Offer a clear empty state with suggestions"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "pricing-three-tier",
+   "title": "Three-tier pricing table with toggle",
+   "category": "pricing",
+   "platform": "web",
+   "tags": [
+    "pricing-table",
+    "light",
+    "minimal",
+    "saas"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f8fafc",
+    "#7c3aed",
+    "#0f172a",
+    "#94a3b8"
+   ],
+   "summary": "Monthly and yearly toggle above three plan cards with the middle plan visually emphasized.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/pricing-three-tier.md",
+   "analysis": {
+    "layout": "Centered header with toggle; three equal cards; middle card raised with an accent border; comparison table below.",
+    "components": [
+     "billing toggle",
+     "plan card",
+     "feature checklist",
+     "popular badge",
+     "comparison table"
+    ],
+    "typography": "Large 40px prices, 14px feature lists.",
+    "colorUsage": "White cards on a pale background, violet accent for the featured plan.",
+    "density": "balanced",
+    "buildHints": [
+     "Show the yearly saving as a percentage",
+     "Keep feature lists parallel in wording",
+     "Repeat the primary button label"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "blog-reading-layout",
+   "title": "Long-form blog article with table of contents",
+   "category": "blog",
+   "platform": "web",
+   "tags": [
+    "editorial",
+    "light",
+    "minimal",
+    "sticky-header"
+   ],
+   "palette": [
+    "#fffefb",
+    "#1a1a1a",
+    "#b45309",
+    "#57534e",
+    "#e7e5e4"
+   ],
+   "summary": "Narrow reading column with a sticky table of contents on the left and related posts at the end.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/blog-reading-layout.md",
+   "analysis": {
+    "layout": "Single 680px column centered; sticky outline in the left margin; author card; related posts grid.",
+    "components": [
+     "article column",
+     "sticky outline",
+     "author card",
+     "pull quote",
+     "related posts"
+    ],
+    "typography": "Serif body at 19px with 1.7 line height, sans headings.",
+    "colorUsage": "Warm off-white background, near-black text, amber for links.",
+    "density": "airy",
+    "buildHints": [
+     "Keep line length near 70 characters",
+     "Highlight the current section in the outline",
+     "Use real figures with captions"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "portfolio-case-study",
+   "title": "Designer portfolio with case study grid",
+   "category": "portfolio",
+   "platform": "web",
+   "tags": [
+    "portfolio",
+    "card-grid",
+    "minimal",
+    "light",
+    "editorial"
+   ],
+   "palette": [
+    "#fafafa",
+    "#ffffff",
+    "#111111",
+    "#ff4d00",
+    "#a3a3a3"
+   ],
+   "summary": "Large project tiles with hover reveals leading to image-heavy case studies.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/portfolio-case-study.md",
+   "analysis": {
+    "layout": "Intro statement at the top; two-column staggered project grid; full-bleed images inside case studies; contact footer.",
+    "components": [
+     "project tile",
+     "hover caption",
+     "full-bleed image",
+     "text intro",
+     "contact footer"
+    ],
+    "typography": "Grotesque sans, 48px intro statement, 14px captions.",
+    "colorUsage": "Neutral greys with one orange accent for hover states.",
+    "density": "airy",
+    "buildHints": [
+     "Let imagery lead and keep captions short",
+     "Add next and previous project links",
+     "Lazy-load large images"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "admin-data-table",
+   "title": "Admin console with filterable data table",
+   "category": "admin",
+   "platform": "web",
+   "tags": [
+    "admin",
+    "data-table",
+    "sidebar-navigation",
+    "light",
+    "data-dense"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f3f4f6",
+    "#4f46e5",
+    "#111827",
+    "#6b7280"
+   ],
+   "summary": "Left navigation, a toolbar with filters and bulk actions, and a dense table with row menus.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/admin-data-table.md",
+   "analysis": {
+    "layout": "Fixed left sidebar; top bar with breadcrumbs; toolbar above a full-width table; pagination footer.",
+    "components": [
+     "sidebar",
+     "data table",
+     "bulk action bar",
+     "status badge",
+     "row menu"
+    ],
+    "typography": "13px table text, 12px headers in small caps, 20px page title.",
+    "colorUsage": "White table on a light grey page, indigo for selection, colored badges for status.",
+    "density": "dense",
+    "buildHints": [
+     "Make table headers sticky",
+     "Show bulk actions only when rows are selected",
+     "Provide column visibility controls"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "analytics-overview",
+   "title": "Analytics overview with date range and charts",
+   "category": "analytics",
+   "platform": "web",
+   "tags": [
+    "analytics",
+    "charts",
+    "stat-cards",
+    "light",
+    "data-dense"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f8fafc",
+    "#2563eb",
+    "#10b981",
+    "#f59e0b"
+   ],
+   "summary": "Date range picker above KPI cards, a main trend chart and ranked breakdown tables.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/analytics-overview.md",
+   "analysis": {
+    "layout": "Header with range and compare toggles; KPI row of four cards; wide line chart; two breakdown tables side by side.",
+    "components": [
+     "date range picker",
+     "kpi card",
+     "line chart",
+     "breakdown table",
+     "compare toggle"
+    ],
+    "typography": "Tabular 28px KPI numbers, 12px captions.",
+    "colorUsage": "White cards, blue primary series, green and amber for positive and caution deltas.",
+    "density": "dense",
+    "buildHints": [
+     "Show deltas with arrows and color",
+     "Keep chart series colors consistent with the legend",
+     "Provide a table view toggle for accessibility"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "calendar-week-view",
+   "title": "Calendar week view with event drawer",
+   "category": "calendar",
+   "platform": "desktop",
+   "tags": [
+    "calendar",
+    "light",
+    "sidebar-navigation",
+    "drag-and-drop"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f1f3f4",
+    "#1a73e8",
+    "#34a853",
+    "#ea4335"
+   ],
+   "summary": "Time grid for seven days with colored event blocks and a mini month picker on the left.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/calendar-week-view.md",
+   "analysis": {
+    "layout": "Left mini calendar and calendar list; main time grid with a current-time line; slide-over drawer for event details.",
+    "components": [
+     "mini month",
+     "time grid",
+     "event block",
+     "now indicator",
+     "event drawer"
+    ],
+    "typography": "12px time labels, 13px event titles.",
+    "colorUsage": "White grid with light grey lines; events in a small set of saturated colors.",
+    "density": "dense",
+    "buildHints": [
+     "Snap dragging to 15 minute steps",
+     "Show overlapping events side by side",
+     "Open creation on grid click"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "map-with-list",
+   "title": "Map discovery with synced result list",
+   "category": "maps",
+   "platform": "web",
+   "tags": [
+    "map-with-list",
+    "search",
+    "filter-bar",
+    "travel",
+    "light"
+   ],
+   "palette": [
+    "#ffffff",
+    "#e8f0fe",
+    "#ef4444",
+    "#0f172a",
+    "#64748b"
+   ],
+   "summary": "A scrollable list on the left stays in sync with markers on a map, with filters along the top.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/map-with-list.md",
+   "analysis": {
+    "layout": "Filter row on top; left list of cards; right map filling the remaining space; hover link between cards and markers.",
+    "components": [
+     "map",
+     "marker",
+     "result card",
+     "filter chip",
+     "price pin"
+    ],
+    "typography": "14px card text, bold price pins.",
+    "colorUsage": "Muted map tiles, red markers, white cards.",
+    "density": "balanced",
+    "buildHints": [
+     "Highlight the marker when a card is hovered",
+     "Offer search this area on pan",
+     "Collapse the list into a bottom sheet on mobile"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "music-player-now-playing",
+   "title": "Now playing screen with queue",
+   "category": "media-player",
+   "platform": "ios",
+   "tags": [
+    "media-player",
+    "mobile",
+    "dark",
+    "player-controls",
+    "colorful"
+   ],
+   "palette": [
+    "#121212",
+    "#282828",
+    "#1db954",
+    "#b3b3b3",
+    "#ffffff"
+   ],
+   "summary": "Large artwork, scrubber, transport controls and a pull-up queue.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/music-player-now-playing.md",
+   "analysis": {
+    "layout": "Vertical stack: header, square artwork, title block, scrubber, controls row, secondary actions; queue sheet from the bottom.",
+    "components": [
+     "artwork",
+     "scrubber",
+     "transport controls",
+     "queue sheet",
+     "like button"
+    ],
+    "typography": "Bold 24px track title, 14px artist, tabular time labels.",
+    "colorUsage": "Dark base with a background tint sampled from the artwork and one green accent.",
+    "density": "airy",
+    "buildHints": [
+     "Sample the artwork for a gradient background",
+     "Keep the play button the largest control",
+     "Support swipe down to dismiss"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "banking-account-overview",
+   "title": "Banking app account overview",
+   "category": "finance",
+   "platform": "android",
+   "tags": [
+    "finance",
+    "mobile",
+    "light",
+    "stat-cards",
+    "feed"
+   ],
+   "palette": [
+    "#f5f7fa",
+    "#ffffff",
+    "#0b5fff",
+    "#0f172a",
+    "#16a34a"
+   ],
+   "summary": "Balance card with quick actions above a grouped transaction list.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/banking-account-overview.md",
+   "analysis": {
+    "layout": "Top app bar; large balance card; quick action row; transaction list grouped by day; bottom navigation.",
+    "components": [
+     "balance card",
+     "quick action row",
+     "transaction row",
+     "day header",
+     "bottom navigation"
+    ],
+    "typography": "Large 36px balance, 14px transaction text, muted category labels.",
+    "colorUsage": "Light background, blue balance card, green for incoming amounts.",
+    "density": "balanced",
+    "buildHints": [
+     "Mask the balance with a tap to reveal",
+     "Group transactions by day",
+     "Use clear icons for categories"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "course-lesson-view",
+   "title": "Online course lesson with outline sidebar",
+   "category": "education",
+   "platform": "web",
+   "tags": [
+    "education",
+    "sidebar-navigation",
+    "progress-tracker",
+    "light"
+   ],
+   "palette": [
+    "#ffffff",
+    "#f5f3ff",
+    "#6d28d9",
+    "#1e1b4b",
+    "#a78bfa"
+   ],
+   "summary": "Video lesson area with a collapsible course outline, progress bar and notes tab.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/course-lesson-view.md",
+   "analysis": {
+    "layout": "Left outline with checkmarks; central video; tabs for overview, notes and discussion; sticky next lesson button.",
+    "components": [
+     "course outline",
+     "video player",
+     "progress bar",
+     "tab bar",
+     "next lesson button"
+    ],
+    "typography": "16px body, 22px lesson title.",
+    "colorUsage": "White and lavender surfaces, purple progress and actions.",
+    "density": "balanced",
+    "buildHints": [
+     "Resume where the learner stopped",
+     "Show completion percentage near the title",
+     "Allow playback speed controls"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "travel-itinerary-planner",
+   "title": "Trip itinerary planner with day timeline",
+   "category": "travel",
+   "platform": "web",
+   "tags": [
+    "travel",
+    "timeline",
+    "map-with-list",
+    "light",
+    "calendar"
+   ],
+   "palette": [
+    "#ffffff",
+    "#ecfeff",
+    "#0891b2",
+    "#164e63",
+    "#f97316"
+   ],
+   "summary": "Day-by-day timeline of bookings and activities beside a map of the route.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/travel-itinerary-planner.md",
+   "analysis": {
+    "layout": "Left itinerary with day sections and timed cards; right map; header with trip dates and travelers.",
+    "components": [
+     "day section",
+     "booking card",
+     "timeline rail",
+     "route map",
+     "add activity button"
+    ],
+    "typography": "15px card text, 20px day titles.",
+    "colorUsage": "White and pale cyan surfaces, teal accents, orange for pending items.",
+    "density": "balanced",
+    "buildHints": [
+     "Show travel time between stops",
+     "Allow drag reordering within a day",
+     "Mark unconfirmed bookings clearly"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "health-habit-tracker",
+   "title": "Habit tracker with streak calendar",
+   "category": "health-fitness",
+   "platform": "android",
+   "tags": [
+    "health-fitness",
+    "mobile",
+    "calendar",
+    "progress-tracker",
+    "playful"
+   ],
+   "palette": [
+    "#fef3c7",
+    "#ffffff",
+    "#f59e0b",
+    "#7c3aed",
+    "#1f2937"
+   ],
+   "summary": "Daily habit checklist with streak flames and a monthly heat calendar.",
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/health-habit-tracker.md",
+   "analysis": {
+    "layout": "Header with date strip; list of habit cards with check controls; monthly heatmap section; floating add button.",
+    "components": [
+     "date strip",
+     "habit card",
+     "streak badge",
+     "heatmap calendar",
+     "floating action button"
+    ],
+    "typography": "Rounded sans, 18px habit names, 12px streak counts.",
+    "colorUsage": "Warm yellow background, amber and purple accents, white cards.",
+    "density": "balanced",
+    "buildHints": [
+     "Celebrate streaks with subtle motion",
+     "Let users skip a day without breaking a streak",
+     "Keep the add button reachable with one thumb"
+    ]
+   },
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "crm-sales-dashboard",
+   "title": "Sales CRM dashboard with pipeline board",
+   "category": "dashboard",
+   "platform": "web",
+   "tags": [
+    "light",
+    "kanban-board",
+    "stat-cards",
+    "sidebar-navigation",
+    "data-dense"
+   ],
+   "palette": [
+    "#f8fafc",
+    "#ffffff",
+    "#0ea5e9",
+    "#6366f1",
+    "#0f172a"
+   ],
+   "summary": "Sales overview with revenue stat cards on top and a kanban pipeline of deals below.",
+   "analysis": {
+    "layout": "Fixed left sidebar; header with search and quick add; stat card row; horizontally scrolling kanban columns for deal stages.",
+    "components": [
+     "sidebar navigation",
+     "stat card",
+     "kanban column",
+     "deal card",
+     "avatar stack",
+     "search bar"
+    ],
+    "typography": "14px interface text, 24px tabular stat numbers, 12px column headers in small caps.",
+    "colorUsage": "White cards on a pale slate page; sky blue for primary actions and indigo for the current stage.",
+    "density": "dense",
+    "buildHints": [
+     "Show the total value at the top of every kanban column",
+     "Support drag between columns with a visible drop target",
+     "Keep stat cards to four across on desktop"
+    ]
+   },
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/crm-sales-dashboard.md",
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  },
+  {
+   "sourceId": "smart-home-dashboard-mobile",
+   "title": "Smart home control dashboard",
+   "category": "dashboard",
+   "platform": "android",
+   "tags": [
+    "dark",
+    "mobile",
+    "stat-cards",
+    "card-grid",
+    "playful"
+   ],
+   "palette": [
+    "#0f172a",
+    "#1e293b",
+    "#38bdf8",
+    "#fbbf24",
+    "#f1f5f9"
+   ],
+   "summary": "Room tabs above a two-column grid of device tiles with toggles and a live energy chart.",
+   "analysis": {
+    "layout": "Top app bar with room chips; two-column tile grid; energy summary card pinned above the grid; bottom navigation.",
+    "components": [
+     "room chip",
+     "device tile",
+     "toggle switch",
+     "energy chart",
+     "bottom navigation",
+     "stat card"
+    ],
+    "typography": "Rounded sans, 16px tile titles, 12px status text, 28px energy figure.",
+    "colorUsage": "Dark navy surfaces; sky blue marks active devices and amber marks warnings.",
+    "density": "balanced",
+    "buildHints": [
+     "Make the whole tile tappable, not only the toggle",
+     "Show state with color plus a text label",
+     "Keep the energy card collapsible"
+    ]
+   },
+   "sourceUrl": "https://github.com/paneledison-prog/Edison-X.-mcp/blob/main/library/designs/smart-home-dashboard-mobile.md",
+   "creator": {
+    "name": "Edison X"
+   },
+   "license": "owned",
+   "attribution": "Original Edison X reference pattern - owner-authored, no third-party content"
+  }
+ ]
+}

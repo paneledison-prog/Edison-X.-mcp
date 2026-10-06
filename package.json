@@ -1,0 +1,64 @@
+{
+  "name": "edison-x",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Edison X: an MCP server that gives AI agents credited, searchable UI design inspiration from legally cleared sources.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "better-sqlite3": "^13.0.3",
+    "pino": "^10.4.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.4",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  },
+  "main": "dist/index.js",
+  "bin": {
+    "edison-x": "dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "ci": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
+    "audit:deps": "pnpm audit --audit-level=high",
+    "gen:key": "node -e \"console.log(require(\\\"node:crypto\\\").randomBytes(32).toString(\\\"base64\\\"))\"",
+    "keys:create": "tsx src/cli/keys.ts create",
+    "keys:list": "tsx src/cli/keys.ts list",
+    "keys:revoke": "tsx src/cli/keys.ts revoke",
+    "library:import": "tsx src/cli/library-import.ts",
+    "design:remove": "tsx src/cli/design-remove.ts",
+    "source:purge": "tsx src/cli/design-remove.ts --source",
+    "analysis:backfill": "tsx src/cli/analysis-backfill.ts",
+    "db:backup": "tsx src/cli/db.ts backup",
+    "db:restore": "tsx src/cli/db.ts restore",
+    "load:test": "tsx scripts/load-test.ts"
+  }
+}
