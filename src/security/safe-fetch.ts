@@ -124,7 +124,7 @@ export async function safeFetch(urlInput: string, opts: SafeFetchOptions): Promi
   for (let hop = 0; hop <= maxRedirects; hop++) {
     const checked = checkUrl(current, { allowedHosts: opts.allowedHosts });
     if (!checked.ok) throw new SsrfError(checked.reason);
-    const res = await transport(checked.url, { method, headers, body, timeoutMs, maxBytes, signal: opts.signal }, lookup);
+    const res = await transport(checked.url, { method, headers: { ...headers }, body, timeoutMs, maxBytes, signal: opts.signal }, lookup);
     if (res.status >= 300 && res.status < 400 && header(res.headers, "location")) {
       if (hop === maxRedirects) throw new SsrfError("too_many_redirects");
       current = new URL(header(res.headers, "location") as string, checked.url).toString();

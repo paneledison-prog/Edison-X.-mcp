@@ -141,4 +141,53 @@ CREATE TABLE analysis_usage (
     name: "analysis_failure_tracking",
     sql: `ALTER TABLE designs ADD COLUMN analysis_failed_at TEXT;`,
   },
+  {
+    // Per-person cached designs from the same source must not collide on the global design id:
+    // identity becomes (id, owner). Rows keep their rid so the FTS index stays valid.
+    id: 3,
+    name: "designs_identity_per_owner",
+    sql: `
+CREATE TABLE designs_v3 (
+  rid INTEGER PRIMARY KEY,
+  id TEXT NOT NULL,
+  source TEXT NOT NULL,
+  source_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  source_url TEXT NOT NULL,
+  image_url TEXT,
+  thumbnail_url TEXT,
+  creator_name TEXT,
+  creator_url TEXT,
+  license TEXT,
+  attribution TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  category TEXT,
+  tags TEXT NOT NULL,
+  palette TEXT,
+  summary TEXT,
+  analysis TEXT,
+  analysis_by TEXT,
+  owner_principal_id TEXT,
+  submitted_by TEXT,
+  fetched_at TEXT NOT NULL,
+  expires_at TEXT,
+  analysis_failed_at TEXT,
+  owner_key TEXT GENERATED ALWAYS AS (COALESCE(owner_principal_id, '')) VIRTUAL
+);
+INSERT INTO designs_v3 (rid, id, source, source_id, title, source_url, image_url, thumbnail_url, creator_name, creator_url,
+  license, attribution, platform, category, tags, palette, summary, analysis, analysis_by, owner_principal_id, submitted_by,
+  fetched_at, expires_at, analysis_failed_at)
+SELECT rid, id, source, source_id, title, source_url, image_url, thumbnail_url, creator_name, creator_url,
+  license, attribution, platform, category, tags, palette, summary, analysis, analysis_by, owner_principal_id, submitted_by,
+  fetched_at, expires_at, analysis_failed_at FROM designs;
+DROP TABLE designs;
+ALTER TABLE designs_v3 RENAME TO designs;
+CREATE UNIQUE INDEX uq_designs_id_owner ON designs(id, owner_key);
+CREATE INDEX idx_designs_id ON designs(id);
+CREATE INDEX idx_designs_source ON designs(source);
+CREATE INDEX idx_designs_expires ON designs(expires_at);
+CREATE INDEX idx_designs_owner ON designs(owner_principal_id);
+CREATE INDEX idx_designs_source_url ON designs(source_url);
+`,
+  },
 ];

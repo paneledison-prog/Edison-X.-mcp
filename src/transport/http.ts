@@ -186,7 +186,7 @@ export function createHttpServer(app: App): Server {
       if (!connect[2] && method === "GET") {
         // A browser cannot send a Bearer header, so the link from get_connection_status carries a signed, short-lived ticket.
         const ticket = url.searchParams.get("t");
-        const verified = ticket ? app.connections.verifyTicket(ticket) : null;
+        const verified = ticket ? app.connections.verifyTicket(ticket, app.runDeps.clock().getTime()) : null;
         if (!verified || verified.source !== source) {
           if (authFailures.record(clientIp(req)) <= 5) audit.record("auth_denied", null, { route: "connect" });
           return sendHtml(res, 401, "This connect link is invalid or has expired. Ask your agent for a new one.");

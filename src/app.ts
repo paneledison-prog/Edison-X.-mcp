@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { KeyService } from "./auth/keys.js";
 import { OAuthService, type OAuthProvider } from "./auth/oauth.js";
+import { PinterestConnections } from "./auth/oauth-pinterest.js";
 import { createApiKeyResolver, localPrincipal, type ResolvePrincipal } from "./auth/principal.js";
 import type { Config } from "./config.js";
 import { AuditLog } from "./observability/audit.js";
@@ -19,6 +20,8 @@ import { SimilarService } from "./services/similar.js";
 import { SourcesInfoService } from "./services/sources-info.js";
 import { importLibraryFile } from "./sources/library/import.js";
 import { LibraryAdapter, LIBRARY_ID } from "./sources/library/index.js";
+import { PinterestAdapter, PINTEREST_ID } from "./sources/pinterest/index.js";
+import { PinterestClient, type PinterestFetch } from "./sources/pinterest/client.js";
 import { loadRegisterFile, type RawEntry } from "./sources/register.js";
 import { loadSources, type SourceRegistry } from "./sources/registry.js";
 import type { SourceAdapter } from "./sources/types.js";
@@ -51,6 +54,8 @@ export interface AppOverrides {
   register?: Map<string, RawEntry>;
   oauthProviders?: Map<string, OAuthProvider>;
   imageFetcher?: ImageFetcher;
+  /** Test seam: replaces the outbound HTTP used by the Pinterest client. */
+  pinterestFetcher?: PinterestFetch;
   repo?: SqliteRepository;
 }
 
@@ -71,7 +76,18 @@ export function createApp(config: Config, overrides: AppOverrides = {}): App {
   }
 
   const adapters: SourceAdapter[] = [new LibraryAdapter(repo, config.libraryImageHosts), ...(overrides.adapters ?? [])];
+  const oauthProviders = overrides.oauthProviders ?? new Map<string, OAuthProvider>();
+  let pinterestProvider: PinterestConnections | undefined;
+  if (config.pinterest && config.enabledSources.includes(PINTEREST_ID) && !adapters.some((a) => a.id === PINTEREST_ID)) {
+    const client = new PinterestClient({ ...config.pinterest, fetcher: overrides.pinterestFetcher });
+    const connections = new PinterestConnections(repo, client, config.pinterest, config.tokenEncryptionKey, clock);
+    adapters.push(new PinterestAdapter(connections, client));
+    pinterestProvider = connections;
+  }
   const registry = loadSources({ enabledIds: config.enabledSources, adapters, register, now: clock(), logger, audit });
+
+  // A source the registry refused must not be connectable either.
+  if (pinterestProvider && registry.get(PINTEREST_ID)) oauthProviders.set(PINTEREST_ID, pinterestProvider);
 
   const lib = registry.get(LIBRARY_ID);
   if (lib && repo.countDesigns(LIBRARY_ID) === 0 && existsSync(config.librarySeedPath)) {
@@ -109,7 +125,7 @@ export function createApp(config: Config, overrides: AppOverrides = {}): App {
     connections,
   };
   const keys = new KeyService(repo, audit, clock);
-  const oauth = new OAuthService(repo, audit, overrides.oauthProviders ?? new Map(), clock);
+  const oauth = new OAuthService(repo, audit, oauthProviders, clock);
 
   return {
     config,

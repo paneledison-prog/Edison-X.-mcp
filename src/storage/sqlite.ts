@@ -103,7 +103,8 @@ export class SqliteRepository implements Repository {
 
   upsertDesign(d: Design, opts: DesignWriteOptions = {}): void {
     const tx = this.db.transaction(() => {
-      const existing = this.db.prepare("SELECT rid, analysis, analysis_by FROM designs WHERE id = ?").get(d.id) as
+      const ownerKey = opts.ownerPrincipalId ?? "";
+      const existing = this.db.prepare("SELECT rid, analysis, analysis_by FROM designs WHERE id = ? AND owner_key = ?").get(d.id, ownerKey) as
         | { rid: number; analysis: string | null; analysis_by: string | null }
         | undefined;
 
@@ -147,7 +148,7 @@ export class SqliteRepository implements Repository {
            VALUES (@id, @source, @source_id, @title, @source_url, @image_url, @thumbnail_url, @creator_name, @creator_url,
              @license, @attribution, @platform, @category, @tags, @palette, @summary, @analysis, @analysis_by,
              @owner_principal_id, @submitted_by, @fetched_at, @expires_at)
-           ON CONFLICT(id) DO UPDATE SET
+           ON CONFLICT(id, owner_key) DO UPDATE SET
              title=excluded.title, source_url=excluded.source_url, image_url=excluded.image_url,
              thumbnail_url=excluded.thumbnail_url, creator_name=excluded.creator_name, creator_url=excluded.creator_url,
              license=excluded.license, attribution=excluded.attribution, platform=excluded.platform,
@@ -156,7 +157,7 @@ export class SqliteRepository implements Repository {
              expires_at=excluded.expires_at`,
         )
         .run(params);
-      const rid = (this.db.prepare("SELECT rid FROM designs WHERE id = ?").get(d.id) as { rid: number }).rid;
+      const rid = (this.db.prepare("SELECT rid FROM designs WHERE id = ? AND owner_key = ?").get(d.id, ownerKey) as { rid: number }).rid;
       this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(rid);
       this.db
         .prepare("INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)")
@@ -174,7 +175,7 @@ export class SqliteRepository implements Repository {
   getDesign(id: string, viewer: ViewerContext): Design | null {
     const row = this.db
       .prepare(
-        `SELECT d.* FROM designs d WHERE d.id = @id AND ${this.visibleClause(0)}`,
+        `SELECT d.* FROM designs d WHERE d.id = @id AND ${this.visibleClause(0)} ORDER BY d.owner_key DESC LIMIT 1`,
       )
       .get({ id, now: viewer.now.toISOString(), viewer: viewer.principalId }) as Row | undefined;
     return row ? this.rowToDesign(row) : null;
@@ -253,21 +254,30 @@ export class SqliteRepository implements Repository {
     return row.n;
   }
 
+  /** Writes to every row with this id (one per owner for per-user sources). Returns true if any row changed. */
   private writeAnalysis(id: string, analysis: DesignAnalysis, allowOverwriteOwner: boolean): boolean {
     const tx = this.db.transaction(() => {
-      const row = this.db.prepare("SELECT rid, title, tags, summary, category, analysis_by FROM designs WHERE id = ?").get(id) as
-        | { rid: number; title: string; tags: string; summary: string | null; category: string | null; analysis_by: string | null }
-        | undefined;
-      if (!row) return false;
-      if (!allowOverwriteOwner && row.analysis_by === "owner") return false;
-      this.db
-        .prepare("UPDATE designs SET analysis = ?, analysis_by = ?, analysis_failed_at = NULL WHERE id = ?")
-        .run(j(analysis), analysis.generatedBy, id);
-      this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(row.rid);
-      this.db
-        .prepare("INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)")
-        .run(row.rid, row.title, (JSON.parse(row.tags) as string[]).join(" "), row.summary ?? "", analysisText(analysis), row.category ?? "");
-      return true;
+      const rows = this.db.prepare("SELECT rid, title, tags, summary, category, analysis_by FROM designs WHERE id = ?").all(id) as Array<{
+        rid: number;
+        title: string;
+        tags: string;
+        summary: string | null;
+        category: string | null;
+        analysis_by: string | null;
+      }>;
+      let changed = false;
+      for (const row of rows) {
+        if (!allowOverwriteOwner && row.analysis_by === "owner") continue;
+        this.db
+          .prepare("UPDATE designs SET analysis = ?, analysis_by = ?, analysis_failed_at = NULL WHERE rid = ?")
+          .run(j(analysis), analysis.generatedBy, row.rid);
+        this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(row.rid);
+        this.db
+          .prepare("INSERT INTO designs_fts (rowid, title, tags, summary, analysis_text, category) VALUES (?, ?, ?, ?, ?, ?)")
+          .run(row.rid, row.title, (JSON.parse(row.tags) as string[]).join(" "), row.summary ?? "", analysisText(analysis), row.category ?? "");
+        changed = true;
+      }
+      return changed;
     });
     return tx();
   }
@@ -300,10 +310,12 @@ export class SqliteRepository implements Repository {
 
   deleteDesign(id: string): boolean {
     return this.db.transaction(() => {
-      const row = this.db.prepare("SELECT rid FROM designs WHERE id = ?").get(id) as { rid: number } | undefined;
-      if (!row) return false;
-      this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(row.rid);
-      this.db.prepare("DELETE FROM designs WHERE rid = ?").run(row.rid);
+      const rows = this.db.prepare("SELECT rid FROM designs WHERE id = ?").all(id) as Array<{ rid: number }>;
+      if (rows.length === 0) return false;
+      for (const row of rows) {
+        this.db.prepare("DELETE FROM designs_fts WHERE rowid = ?").run(row.rid);
+        this.db.prepare("DELETE FROM designs WHERE rid = ?").run(row.rid);
+      }
       this.db.prepare("DELETE FROM collection_items WHERE design_id = ?").run(id);
       this.db.prepare("DELETE FROM source_cache WHERE design_ids LIKE ?").run(`%"${id}"%`);
       return true;
