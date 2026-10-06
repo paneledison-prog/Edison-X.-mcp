@@ -2,6 +2,7 @@ import { createApp } from "../app.js";
 import { loadConfig } from "../config.js";
 import { importLibraryFile } from "../sources/library/import.js";
 import { LIBRARY_ID } from "../sources/library/index.js";
+import { CATEGORY_SET } from "../services/taxonomy.js";
 import { fail } from "./context.js";
 
 const file = process.argv[2];
@@ -26,6 +27,7 @@ try {
       capabilities: lib.capabilities,
       ownerContent: true,
     },
+    categories: CATEGORY_SET,
     now: new Date(),
     onFlag: (e) =>
       app.audit.record("sanitizer_flag", null, { source: "library", field: e.field, rule: e.rule }),

@@ -1,5 +1,4 @@
 import { SourceError } from "../../errors.js";
-import type { PinterestConnections } from "../../auth/oauth-pinterest.js";
 import { PinterestClient, PINTEREST_API_HOST, PINTEREST_IMAGE_HOST, type Pin } from "./client.js";
 import type {
   ConnectionStatus,
@@ -12,6 +11,14 @@ import type {
 } from "../types.js";
 
 export const PINTEREST_ID = "pinterest";
+
+/** What the adapter needs from the connection store. Defined here so sources do not depend on auth. */
+export interface PinterestTokens {
+  isConnected(principalId: string): boolean;
+  getAccessToken(principalId: string, signal?: AbortSignal): Promise<string>;
+  refresh(principalId: string, signal?: AbortSignal): Promise<string>;
+  disconnect(principalId: string): Promise<void>;
+}
 const MAX_PAGES = 4;
 
 const tokens = (s: string): string[] =>
@@ -65,7 +72,7 @@ export class PinterestAdapter implements SourceAdapter {
   };
 
   constructor(
-    private readonly connections: PinterestConnections,
+    private readonly connections: PinterestTokens,
     private readonly client: PinterestClient,
   ) {}
 

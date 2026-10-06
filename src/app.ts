@@ -28,6 +28,7 @@ import type { SourceAdapter } from "./sources/types.js";
 import { FtsTextScorer } from "./storage/fts-scorer.js";
 import { SqliteRepository } from "./storage/sqlite.js";
 import type { RunDeps } from "./tools/run.js";
+import { CATEGORY_SET } from "./services/taxonomy.js";
 import type { Principal } from "./auth/scopes.js";
 
 export interface App {
@@ -119,6 +120,7 @@ export function createApp(config: Config, overrides: AppOverrides = {}): App {
         capabilities: lib.capabilities,
         ownerContent: true,
       },
+      categories: CATEGORY_SET,
       now: clock(),
     });
     logger.info({ imported: res.imported, rejected: res.rejected.length }, "seeded the library");

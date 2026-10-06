@@ -3,6 +3,7 @@ import type { App } from "../../src/app.js";
 import { importLibraryDesigns } from "../../src/sources/library/import.js";
 import { ALL_TOOLS } from "../../src/tools/index.js";
 import { ALL_SCOPES, connect, principalWith, testApp, type TestClient } from "../helpers/app.js";
+import { CATEGORY_SET } from "../../src/services/taxonomy.js";
 import { NOW } from "../helpers/fixtures.js";
 
 let app: App;
@@ -170,6 +171,18 @@ describe("submit_design", () => {
     expect(row.submitted_by).toBe("p_a");
   });
 
+  it("origin is optional: only source_url, attribution and license are required", async () => {
+    const { origin: _o, ...noOrigin } = valid;
+    const r = await a.data<{ id: string }>("submit_design", {
+      ...noOrigin,
+      source_url: "https://studio.example.org/work/no-origin",
+    });
+    expect(r.id).toMatch(/^library:u-/);
+    expect(app.repo.listAudit({ event: "library_submission", limit: 1 })[0]?.details.origin).toBe(
+      "unspecified",
+    );
+  });
+
   it("is idempotent per source URL: resubmitting updates instead of duplicating", async () => {
     const first = await a.data<{ id: string; created: boolean }>("submit_design", valid);
     const second = await a.data<{ id: string; created: boolean }>("submit_design", {
@@ -256,6 +269,7 @@ describe("submit_design", () => {
           capabilities: lib.capabilities,
           ownerContent: true,
         },
+        categories: CATEGORY_SET,
         now: NOW,
       },
     );

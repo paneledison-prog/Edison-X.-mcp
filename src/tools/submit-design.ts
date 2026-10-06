@@ -23,7 +23,10 @@ const inputSchema = {
     ),
   origin: z
     .enum(ORIGINS)
-    .describe("How you have the right to include it: 'owned', 'open-license' or 'licensed'."),
+    .optional()
+    .describe(
+      "How you have the right to include it: 'owned', 'open-license' or 'licensed'. Optional, but record it when you know it.",
+    ),
   origin_source: z
     .string()
     .max(32)

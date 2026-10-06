@@ -5,6 +5,7 @@ import { importLibraryDesigns } from "../sources/library/import.js";
 import type { LoadedSource } from "../sources/registry.js";
 import type { RequestContext } from "../sources/types.js";
 import { canonicalUrl } from "./ranking.js";
+import { CATEGORY_SET } from "./taxonomy.js";
 import type { ServiceDeps } from "./context.js";
 
 /**
@@ -21,7 +22,7 @@ export interface SubmitInput {
   sourceUrl: string;
   attribution: string;
   license: string;
-  origin: Origin;
+  origin?: Origin;
   originSource?: string;
   imageUrl?: string;
   thumbnailUrl?: string;
@@ -97,6 +98,7 @@ export class LibraryService {
         capabilities: lib.capabilities,
         ownerContent: true,
       },
+      categories: CATEGORY_SET,
       now: ctx.now,
       submittedBy: ctx.principal.id,
       onFlag: (e) =>
@@ -118,7 +120,7 @@ export class LibraryService {
     }
     this.deps.audit.record("library_submission", ctx.principal.id, {
       id,
-      origin: input.origin,
+      origin: input.origin ?? "unspecified",
       license: input.license,
     });
     return { id, created: !existed };

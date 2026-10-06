@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { z } from "zod";
 import { sanitizeDesign, type FlagHandler } from "../../security/sanitize.js";
-import { CATEGORY_SET } from "../../services/taxonomy.js";
 import type { DesignRepository } from "../../storage/repository.js";
 import { LIBRARY_ID } from "./index.js";
 import type { RawDesign, SourceAdapter } from "../types.js";
@@ -19,6 +18,8 @@ export interface ImportResult {
 export interface ImportOptions {
   repo: DesignRepository;
   adapter: Pick<SourceAdapter, "id" | "attributionTemplate" | "capabilities" | "ownerContent">;
+  /** Valid category ids (the taxonomy). Passed in so this layer does not depend on services. */
+  categories: ReadonlySet<string>;
   now: Date;
   submittedBy?: string;
   onFlag?: FlagHandler;
@@ -47,7 +48,7 @@ export function importLibraryDesigns(
     const sanitized = sanitizeDesign(raw, {
       adapter: opts.adapter,
       now: opts.now,
-      categories: CATEGORY_SET,
+      categories: opts.categories,
       onFlag: (e) => {
         flagged = true;
         opts.onFlag?.(e);
